@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<!-- Basic Header Information -->
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <meta charset="utf-8">
+    <title>WSDOT BrM API Testing</title>
+
+    <!-- Use separate css file in the folder -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+
+<!-- Body -->
+<body>
+
+    <!--Main Heading-->
+    <div id="mainHeaderDiv">
+        <h1>WSDOT BrM API Requests Testing</h1>
+    </div>
+
+    <!--Authorization section-->
+    <div id="authDiv">
+        <header id="authHeader">
+            <h2>Authorization</h2>
+        </header>
+
+        <section id="authSection">
+            <nav id="authNav">
+                <h2 id="authNavHeader">Authorization Request</h2><br>
+                <label for="database_id">Enter database id number:</label>
+                <input type="text" id="authInput" name="database_id"><br>
+                <button id="authButton" type="button" onclick="getAuth()">Get Authorization Token</button>
+                <p>Default token timeout is 1200 seconds (20 min)</p>
+                Time Remaining: <span id="countdown">1200</span> second<span id="plural">s</span>
+            </nav>
+
+            <article id="authArticle">
+                <h1>Auth Response:</h1>
+                <p id="authResponse", class="jsonResponse"></p>
+            </article>
+        </section>
+    </div>
+
+    <!--GET section-->
+    <div id="getDiv"></div>
+        <header id="getHeader">
+            <h2>GET Request</h2>
+        </header>
+
+        <section id="getSection">
+            <nav>
+                <h2 id="getHeader">GET Request</h2>
+                <label for="controller">Enter Controller Name:</label>
+                <input type="text" name="getController"><br>
+
+                <h1>Enter Query String Options</h1>
+                <form>
+                    <label for="s">'s' (items to skips):</label>
+                    <input type="text" name="getSkips"><br>
+                    <label for="t">'t' (items to take):</label>
+                    <input type="text" name="getTakes"><br>
+                    <label for="f">'f' (filter expression):</label>
+                    <input type="text" name="getFilterExp"><br>
+                    <label for="o">'o' (order column):</label>
+                    <input type="text" name="getOrderCol"><br>
+                    <label for="d">'d' (sort direction):</label>
+                    <input type="text" name="getSortDir"><br>
+                </form><br>
+                <button id="getButton" type="button" onclick="getRequest()">Send GET Request</button>
+            </nav>
+
+            <article id="getArticle">
+                <h1>GET Response:</h1>
+                <p id="getResponse", class="jsonResponse">Placeholder</p>
+            </article>
+        </section>
+    </div>
+
+    <!--POST section-->
+    <div id="postDiv"></div>
+        <header id="postHeader">
+            <h2>POST Request</h2>
+        </header>
+
+        <section id="postSection">
+            <nav>
+                <h2 id="postHeader">POST Request</h2>
+                <label for="post">Paste JSON into text box:</label><br>
+                <input type="text" class="inputBox" name="postInput"><br><br>
+                <button id="postButton" type="button">Send POST Request</button>
+            </nav>
+
+            <article id="postArticle">
+                <h1>POST Response:</h1>
+                <p id="postResponse", class="jsonResponse">Placeholder</p>
+            </article>
+        </section>
+    </div>
+
+    <!--PUT section-->
+    <div id="putDiv"></div>
+        <header id="putHeader">
+            <h2>PUT Request</h2>
+        </header>
+
+        <section id="putSection">
+            <nav>
+                <h2 id="putHeader">PUT Request</h2>
+                <label for="put">Paste JSON into text box:</label><br>
+                <input type="text" class="inputBox" name="putInput"><br><br>
+                <button id="putButton" type="button">Send PUT Request</button>
+            </nav>
+
+            <article id="putArticle">
+                <h1>PUT Response:</h1>
+                <p id="putResponse", class="jsonResponse">Placeholder</p>
+            </article>
+        </section>
+    </div>
+
+    <!--DELETE section-->
+    <div id="deleteDiv"></div>
+        <header id="deleteHeader">
+            <h2>DELETE Request</h2>
+        </header>
+
+        <section id="deleteSection">
+            <nav>
+                <h2 id="deleteHeader">DELETE Request</h2>
+                <label for="delete">Paste JSON into text box:</label><br>
+                <input type="text" class="inputBox" name="deleteInput"><br><br>
+                <button id="deleteButton" type="button">Send DELETE Request</button>
+            </nav>
+
+            <article id="deleteArticle">
+                <h1>DELETE Response:</h1>
+                <p id="deleteResponse", class="jsonResponse">Placeholder</p>
+            </article>
+        </section>
+    </div>
+
+    <!-- Use separate javascript file in the folder -->
+    <script src="main.js"></script>
+</body>
+
+</html>
