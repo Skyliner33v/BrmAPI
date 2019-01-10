@@ -3,6 +3,8 @@
 //Initialize authorization token in a global context to be used in all requests.
 var authToken = ''
 
+
+//Fetches list of available databases
 function getDB() {
     const dbURL = 'http://localhost:9000/api/auth/GetDatabases'
     let dropdown = document.getElementById('locality-dropdown')
@@ -21,7 +23,7 @@ function getDB() {
         .then(
             function (response) {
 
-                // Set response database data to populate the dropdown list 
+                // Set response data to create and populate a dropdown list 
                 response.json().then(function (data) {
                     let option;
 
@@ -39,7 +41,9 @@ function getDB() {
         });
 };
 
+//Get list of Databases on page load to be used for the Authorization Request
 getDB();
+
 
 //Request Authorization token
 function getAuth() {
@@ -100,6 +104,11 @@ function authTimer() {
             document.getElementById("authResponse").textContent = ""
         }
     }, 1000);
+};
+
+//Get list of available controllers and populate a dropdown list
+function getControllers() {
+
 };
 
 
