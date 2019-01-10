@@ -5,49 +5,59 @@ var authToken = ''
 
 function getDB() {
     const dbURL = 'http://localhost:9000/api/auth/GetDatabases'
-    let dbid = ''
+    let dropdown = document.getElementById('locality-dropdown')
+    dropdown.length = 0
+
+    let defaultOption = document.createElement('option')
+    defaultOption.text = 'Select a Database'
+
+    dropdown.add(defaultOption)
+    dropdown.selectedIndex = 0
 
     //Send request to get list of available databases
     fetch(dbURL, {
-        method: 'GET'
-    })
+            method: 'GET'
+        })
+        .then(
+            function (response) {
 
-    //Process returned promise
-    .then(response => response.json())
+                // Set response database data to populate the dropdown list 
+                response.json().then(function (data) {
+                    let option;
 
-    //Prcoess Response Object and pass to setDatabases() to display on the page
-    .then(response => {
-        setDatabases(response)
-    })
-
+                    for (let i = 0; i < data.length; i++) {
+                        option = document.createElement('option');
+                        option.text = 'db ID: ' + data[i].ID + ' ' + data[i].Name;
+                        option.value = data[i].ID;
+                        dropdown.add(option);
+                    }
+                });
+            }
+        )
+        .catch(function (err) {
+            console.error('Fetch Error -', err);
+        });
 };
 
-//Make call to get list of databases on page load
 getDB();
-
-
-//Load list of databases to a dropdown list on the page
-function setDatabases(responseObj) {
-    console.log(responseObj)
-};
-
-
-
 
 //Request Authorization token
 function getAuth() {
 
     //Define API URL and get database ID that was entered
     const authURL = 'http://localhost:9000/api/auth/APILogin'
+    let dbOption = document.getElementById('locality-dropdown')
+    let dbValue = dbOption.options[dbOption.selectedIndex].value
+
     let headers = {
         Accept: 'application/JSON',
         Authorization: 'Basic cG9udGlzOnBvbnRpcw==', //Base64 encoding of the string 'pontis:pontis'
-        database_id: "'" + databaseID + "'"
+        database_id: "'" + dbValue + "'"
     }
 
     //Check to make sure a database id was entered.  
     //Need to add way to check against valid databases or provide a dropdown list
-    if (dbid==null || dbid=="")
+    if (dbValue==null || dbValue=="")
         alert("Enter a database id number")
 
     //If valid database number was entered, send the Authorization GET Request
