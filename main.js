@@ -76,7 +76,7 @@ async function getAuth() {
     //Post response data to page
     document.getElementById('authResponse').innerHTML = JSON.stringify(result)
 
-    //Start the 1200 sec timer
+    //Reset and start the 1200 sec timer
     authTimer()
 
     //Get list of controllers available in the selected database
@@ -102,8 +102,19 @@ function authTimer() {
 
 //Get list of available controllers and populate a dropdown list for the GET requests
 async function getControllers(controllerAuthToken) {
-    
 
+    const controllerURL = 'http://localhost:9000/api/DataDict/getTables'
+    let headers = {
+        auth_token: controllerAuthToken
+    }
+
+    let response = await fetch(controllerURL, {
+        method: 'GET', 
+        headers: headers
+    })
+
+    let result = await response.text()
+    console.log(result)
 };
 
 
