@@ -23,7 +23,7 @@ function getDB() {
         .then(
             function (response) {
 
-                // Set response data to create and populate a dropdown list 
+                // Set response data to create and populate a dropdown list on the page
                 response.json().then(function (data) {
                     let option;
 
@@ -45,48 +45,42 @@ function getDB() {
 getDB();
 
 
-//Request Authorization token
-function getAuth() {
 
-    //Define API URL and get database ID that was entered
-    const authURL = 'http://localhost:9000/api/auth/APILogin'
+//Request Authorization token
+async function getAuth() {
+
+    //Get database id value from page
     let dbOption = document.getElementById('locality-dropdown')
     let dbValue = dbOption.options[dbOption.selectedIndex].value
 
+    //Setup request url and header info
+    const authURL = 'http://localhost:9000/api/auth/APILogin'
     let headers = {
         Accept: 'application/JSON',
         Authorization: 'Basic cG9udGlzOnBvbnRpcw==', //Base64 encoding of the string 'pontis:pontis'
         database_id: "'" + dbValue + "'"
     }
 
-    //Check to make sure a database id was entered.  
-    //Need to add way to check against valid databases or provide a dropdown list
-    if (dbValue==null || dbValue=="")
-        alert("Enter a database id number")
-
-    //If valid database number was entered, send the Authorization GET Request
-    //Need to add way to encode  user:pass on the fly.  Maybe add headers to a separate variable.
-    else fetch(authURL, {
-        method: 'GET', 
+    //Set Get Request
+    let response = await fetch(authURL, {
+        method: 'GET',
         headers: headers
     })
 
-    //Process returned Promise
-    .then(response => {
-        return response.json()
-    })
+    //Process response from the request
+    let result = await response.json()
 
-    //Process Response Object.  Pass token to global variable.  Start 1200 sec timer
-    .then(response => {
-        authToken = response.auth_token
-        document.getElementById('authResponse').innerHTML = JSON.stringify(response)
-        authTimer()
-    })
-    
-    //Handle any errors
-    .catch(function(error) {
-        console.log('Looks like there was a problem: \n', error)
-    })
+    //Set auth_token to global var
+    authToken = result.auth_token
+
+    //Post response data to page
+    document.getElementById('authResponse').innerHTML = JSON.stringify(result)
+
+    //Start the 1200 sec timer
+    authTimer()
+
+    //Get list of controllers available in the selected database
+    await getControllers(result.auth_token)
 };
 
 
@@ -106,8 +100,9 @@ function authTimer() {
     }, 1000);
 };
 
-//Get list of available controllers and populate a dropdown list
-function getControllers() {
+//Get list of available controllers and populate a dropdown list for the GET requests
+async function getControllers(controllerAuthToken) {
+    
 
 };
 
