@@ -7,7 +7,7 @@ var authToken = ''
 //Fetches list of available databases
 function getDB() {
     const dbURL = 'http://localhost:9000/api/auth/GetDatabases'
-    let dropdown = document.getElementById('locality-dropdown')
+    let dropdown = document.getElementById('dbDropdown')
     dropdown.length = 0
 
     let defaultOption = document.createElement('option')
@@ -50,7 +50,7 @@ getDB();
 async function getAuth() {
 
     //Get database id value from page
-    let dbOption = document.getElementById('locality-dropdown')
+    let dbOption = document.getElementById('dbDropdown')
     let dbValue = dbOption.options[dbOption.selectedIndex].value
 
     //Setup request url and header info
@@ -84,6 +84,7 @@ async function getAuth() {
 };
 
 
+
 //1200 second countdown timer to keep track of the authorization window.  Alert user and reset at end of timer. 
 function authTimer() {
     let seconds = document.getElementById("countdown").textContent;
@@ -100,21 +101,46 @@ function authTimer() {
     }, 1000);
 };
 
+
+
 //Get list of available controllers and populate a dropdown list for the GET requests
 async function getControllers(controllerAuthToken) {
 
+    //Setup dropdown stuff
+    let dropdown = document.getElementById('controllerDropdown')
+    dropdown.length = 0
+    let defaultOption = document.createElement('option')
+    defaultOption.text = 'Select a Controller'
+    dropdown.add(defaultOption)
+    dropdown.selectedIndex = 0
+
+    //Setup Request
     const controllerURL = 'http://localhost:9000/api/DataDict/getTables'
     let headers = {
         auth_token: controllerAuthToken
     }
 
+    //GET Request
     let response = await fetch(controllerURL, {
-        method: 'GET', 
+        method: 'GET',
         headers: headers
     })
 
+    //Process response
     let result = await response.text()
-    console.log(result)
+
+    //Remove offending characters from the response and convert it to an actual array
+    let controllerArray = result.replace(/['"\[\]]+/g, '')
+    controllerArray = controllerArray.split(",")
+
+    //Send response data to the controller dropdown on the page
+    let option    
+    for (let i = 0; i < controllerArray.length; i++) {
+        option = document.createElement('option')
+        option.text = controllerArray[i]
+        option.value = controllerArray[i]
+        dropdown.add(option)
+    }
 };
 
 

@@ -29,7 +29,7 @@
         <section id="authSection">
             <nav id="authNav">
                 <h2 id="authNavHeader">Authorization Request</h2><br>
-                <select id="locality-dropdown" name="locality"></select><br>
+                <select id="dbDropdown" name="dbSelect"></select><br>
                 <button id="authButton" type="button" onclick="getAuth()">Get Authorization Token</button>
                 <p>Default token timeout is 1200 seconds (20 min)</p>
                 Time Remaining: <span id="countdown">1200</span> second<span id="plural">s</span>
@@ -52,7 +52,7 @@
             <nav>
                 <h2 id="getHeader">GET Request</h2>
                 <label for="controller">Enter Controller Name:</label>
-                <input type="text" name="getController"><br>
+                <select id="controllerDropdown" name="controllerSelect"></select><br>
 
                 <h1>Enter Query String Options</h1>
                 <form>
