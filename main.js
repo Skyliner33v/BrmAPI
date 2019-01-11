@@ -6,15 +6,17 @@ var authToken = ''
 
 //Fetches list of available databases
 function getDB() {
-    const dbURL = 'http://localhost:9000/api/auth/GetDatabases'
+
+    //Setup dropdown stuff
     let dropdown = document.getElementById('dbDropdown')
     dropdown.length = 0
-
     let defaultOption = document.createElement('option')
     defaultOption.text = 'Select a Database'
-
     dropdown.add(defaultOption)
     dropdown.selectedIndex = 0
+
+    //Setup Request URL
+    const dbURL = 'http://localhost:9000/api/auth/GetDatabases'
 
     //Send request to get list of available databases
     fetch(dbURL, {
@@ -77,6 +79,10 @@ async function getAuth() {
     document.getElementById('authResponse').innerHTML = JSON.stringify(result)
 
     //Reset and start the 1200 sec timer
+    /*TODO:  Need to add way to reset timer from here. 
+    Issue when getting a new auth token and the timer doesnt reset.  
+    Currently when pressing the button before the timer ends it doesn't stop the function and reset the timer
+    */
     authTimer()
 
     //Get list of controllers available in the selected database
