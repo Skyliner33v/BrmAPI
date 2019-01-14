@@ -61,11 +61,11 @@ async function getAuth() {
     //Process response from the request
     let result = await response.json()
 
-    //Set auth_token to global var
-    authToken = result.auth_token
-
     //Post response data to page
     document.getElementById('authResponse').innerHTML = JSON.stringify(result)
+
+    //Set auth_token to global var
+    authToken = result.auth_token
 
     //Reset and start the 1200 sec timer
     /*TODO:  Need to add way to reset timer from here. 
