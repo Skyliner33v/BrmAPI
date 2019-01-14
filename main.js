@@ -4,8 +4,8 @@
 var authToken = ''
 
 
-//Fetches list of available databases
-function getDB() {
+//Fetch list of available databases
+async function getDB() {
 
     //Setup dropdown stuff
     let dropdown = document.getElementById('dbDropdown')
@@ -18,29 +18,18 @@ function getDB() {
     //Setup Request URL
     const dbURL = 'http://localhost:9000/api/auth/GetDatabases'
 
-    //Send request to get list of available databases
-    fetch(dbURL, {
-            method: 'GET'
-        })
-        .then(
-            function (response) {
+    //Send request to get list of available databases and get back json data
+    let response = await fetch(dbURL, {method: 'GET'})
+    let result = await response.json()
 
-                // Set response data to create and populate a dropdown list on the page
-                response.json().then(function (data) {
-                    let option;
-
-                    for (let i = 0; i < data.length; i++) {
-                        option = document.createElement('option');
-                        option.text = 'db ID: ' + data[i].ID + ' ' + data[i].Name;
-                        option.value = data[i].ID;
-                        dropdown.add(option);
-                    }
-                });
-            }
-        )
-        .catch(function (err) {
-            console.error('Fetch Error -', err);
-        });
+    // Set response data to create and populate a dropdown list on the page
+    let option
+    for (let i = 0; i < result.length; i++) {
+        option = document.createElement('option')
+        option.text = 'db ID: ' + result[i].ID + ' ' + result[i].Name
+        option.value = result[i].ID
+        dropdown.add(option)
+    }
 };
 
 //Get list of Databases on page load to be used for the Authorization Request
