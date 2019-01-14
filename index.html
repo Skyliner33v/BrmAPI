@@ -25,7 +25,7 @@
         <header id="authHeader">
             <h2>Authorization</h2>
         </header>
-
+    
         <section id="authSection">
             <nav id="authNav">
                 <h2 id="authNavHeader">Authorization Request</h2><br>
@@ -34,16 +34,16 @@
                 <p>Default token timeout is 1200 seconds (20 min)</p>
                 Time Remaining: <span id="countdown">1200</span> second<span id="plural">s</span>
             </nav>
-
+    
             <article id="authArticle">
                 <h1>Auth Response:</h1>
-                <p id="authResponse", class="jsonResponse"></p>
+                <p id="authResponse" , class="jsonResponse"></p>
             </article>
         </section>
     </div>
 
     <!--GET section-->
-    <div id="getDiv" class="cards">
+    <li id="getDiv" class="cards">
         <header id="getHeader">
             <h2>GET Request</h2>
         </header>
@@ -52,21 +52,40 @@
             <nav>
                 <h2 id="getHeader">GET Request</h2>
                 <label for="controller">Enter Controller Name:</label>
-                <select id="controllerDropdown" name="controllerSelect"></select><br>
+                <select id="controllerDropdown" name="controllerSelect"></select>
 
                 <h1>Enter Query String Options</h1>
-                <form>
-                    <label for="s">'s' (items to skips):</label>
-                    <input type="text" name="getSkips"><br>
-                    <label for="t">'t' (items to take):</label>
-                    <input type="text" name="getTakes"><br>
-                    <label for="f">'f' (filter expression):</label>
-                    <input type="text" name="getFilterExp"><br>
-                    <label for="o">'o' (order column):</label>
-                    <input type="text" name="getOrderCol"><br>
-                    <label for="d">'d' (sort direction):</label>
-                    <input type="text" name="getSortDir"><br>
-                </form><br>
+
+
+
+                <form id="getInputsForm">
+                    <ul class="formWrapper">
+                        <li  class="getInputList">
+                            <label for="s">'s' (items to skips):</label>
+                            <input type="text" id="s" class="getInput" placeholder="Enter an integer for number of items to skip">
+                        </li>
+                        <li  class="getInputList">
+                            <label for="t">'t' (items to take):</label>
+                            <input type="text" id="t" class="getInput" placeholder="Enter an integer for number of items to take">
+                        </li>
+                        <li  class="getInputList">
+                            <label for="f">'f' (filter expression):</label>
+                            <input type="text" id="f" class="getInput" placeholder="Enter a filter Expression">
+                        </li>
+                        <li  class="getInputList">
+                            <label for="o">'o' (order column):</label>
+                            <input type="text" id="o" class="getInput" placeholder="Define a column to Order By">
+                        </li>
+                        <li  class="getInputList">
+                            <label for="d">'d' (sort direction):</label>
+                            <input type="text" id="d" class="getInput" placeholder="ASC or DESC for sort direction">
+                        </li>
+                    </ul>
+                </form>
+
+
+
+
                 <button id="getButton" type="button" onclick="getRequest()">Send GET Request</button>
             </nav>
 

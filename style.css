@@ -54,6 +54,21 @@ article {
     word-wrap: break-word;
 }
 
+/*Style the form elements*/
+.wrapper {
+    list-style-type: none;
+}
+
+.getInputList {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.getInput {
+    width: 100%;
+}
+
+
 /* Style the authorization button*/
 #authButton {
     padding: 10px 24px;

@@ -142,9 +142,6 @@ async function getControllers(controllerAuthToken) {
 //Send GET Request passing in parameters if included
 function getRequest() {
 
-
-    //console.log('getRequest authToken variable = ' + authToken)
-
     
     
 };
