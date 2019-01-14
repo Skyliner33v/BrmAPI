@@ -142,6 +142,15 @@ async function getControllers(controllerAuthToken) {
 //Send GET Request passing in parameters if included
 function getRequest() {
 
-    
-    
+    //Get Input values from the form.  Will be used to build the rest of the GET Request URL
+    let inputs = document.getElementsByClassName('getInput')
+    let formValues = {}
+
+    for(let i =0; i < inputs.length; i++) {
+        formValues[inputs[i].id] = inputs[i].value
+    }
+
+    //Get controller name
+    let controllerName = document.getElementById('controllerDropdown').value
+
 };
