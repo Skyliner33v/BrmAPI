@@ -55,19 +55,13 @@ article {
 }
 
 /*Style the form elements*/
-.wrapper {
+.formWrapper {
     list-style-type: none;
 }
 
-.getInputList {
-    display: flex;
-    justify-content: flex-end;
-}
-
 .getInput {
-    width: 30em;
+    width: 20em;
 }
-
 
 /* Style the authorization button*/
 #authButton {

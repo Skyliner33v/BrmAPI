@@ -109,13 +109,13 @@ async function getControllers(controllerAuthToken) {
     dropdown.add(defaultOption)
     dropdown.selectedIndex = 0
 
-    //Setup Request
+    //Setup Request URL and headers
     const controllerURL = 'http://localhost:9000/api/DataDict/getTables'
     let headers = {
         auth_token: controllerAuthToken
     }
 
-    //GET Request
+    //Send GET Request
     let response = await fetch(controllerURL, {
         method: 'GET',
         headers: headers
@@ -142,15 +142,38 @@ async function getControllers(controllerAuthToken) {
 //Send GET Request passing in parameters if included
 function getRequest() {
 
+    //Get controller name
+    let controllerName = document.getElementById('controllerDropdown').value
+
     //Get Input values from the form.  Will be used to build the rest of the GET Request URL
     let inputs = document.getElementsByClassName('getInput')
     let formValues = {}
 
+    //Parse inputs and store in the formValues array
+    //Will need to add some error handling here for incorrectly formatted input
     for(let i =0; i < inputs.length; i++) {
         formValues[inputs[i].id] = inputs[i].value
     }
 
-    //Get controller name
-    let controllerName = document.getElementById('controllerDropdown').value
+    console.log(formValues)
 
+    //Setup GET Request URL and header info
+    const getURL = 'http://localhost:9000/rest/'
+    let restURL = controllerName + '?'
+    let headers = {
+        auth_token: authToken
+    }
+
+    //Append the values from the formValues array and build 2nd half of the URL string
+    for(let i in formValues) {
+        if (formValues.hasOwnProperty(i)){
+            if (formValues[i] === '') {continue;}
+                restURL += i + '=' + formValues[i] +'&'
+        }
+    }
+    restURL = restURL.slice(0, -1)  //Needed to remove the last '&' from the string
+
+
+
+    
 };
