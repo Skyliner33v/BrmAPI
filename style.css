@@ -40,7 +40,7 @@ section {
 nav {
     flex: 1;
     background: #ccc;
-    padding: 5px;
+    padding: 5px 5px 20px 5px;
     text-align: center;
 }
 
@@ -48,10 +48,13 @@ nav {
 /* Style the artilce and set the response content to a scrollable box */
 article {
     flex: 2;
-    background-color: #f1f1f1;
     padding: 5px;
     overflow: scroll;
     word-wrap: break-word;
+}
+
+pre{
+    white-space: pre-wrap;
 }
 
 /*Style the form elements*/
@@ -67,14 +70,6 @@ article {
 #authButton {
     padding: 10px 24px;
     text-align: center;
-}
-
-/*Set response container default size*/
-p.jsonResponse {
-    height: 200px;
-    color: black;
-    background-color: #ddd;
-    padding: 20px;
 }
 
 /*Set height of the larger JSON input boxes*/

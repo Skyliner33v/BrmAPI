@@ -62,7 +62,7 @@ async function getAuth() {
     let result = await response.json()
 
     //Post response data to page
-    document.getElementById('authResponse').innerHTML = JSON.stringify(result)
+    document.getElementById('authResponse').innerHTML = JSON.stringify(result, undefined, 2)
 
     //Set auth_token to global var
     authToken = result.auth_token
@@ -139,8 +139,8 @@ async function getControllers(controllerAuthToken) {
 };
 
 
-//Send GET Request passing in parameters if included
-function getRequest() {
+//Send a GET Request passing in parameters if included
+async function getRequest() {
 
     //Get controller name
     let controllerName = document.getElementById('controllerDropdown').value
@@ -154,8 +154,6 @@ function getRequest() {
     for(let i =0; i < inputs.length; i++) {
         formValues[inputs[i].id] = inputs[i].value
     }
-
-    console.log(formValues)
 
     //Setup GET Request URL and header info
     const getURL = 'http://localhost:9000/rest/'
@@ -171,9 +169,20 @@ function getRequest() {
                 restURL += i + '=' + formValues[i] +'&'
         }
     }
+
     restURL = restURL.slice(0, -1)  //Needed to remove the last '&' from the string
 
+    //Send the GET request
+    let response = await fetch(getURL + restURL, {
+        method: 'GET',
+        headers: headers
+    })
 
+    //Process response
+    let result = await response.json()
 
+    //Post response data to page
+    document.getElementById('getResponse').innerHTML = JSON.stringify(result, undefined, 2)
+    console.log(result)
     
 };
