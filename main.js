@@ -101,14 +101,6 @@ function authTimer() {
 //Get list of available controllers and populate a dropdown list for the GET requests
 async function getControllers(controllerAuthToken) {
 
-    //Setup dropdown stuff
-    let dropdown = document.getElementById('controllerDropdown')
-    dropdown.length = 0
-    let defaultOption = document.createElement('option')
-    defaultOption.text = 'Select a Controller'
-    dropdown.add(defaultOption)
-    dropdown.selectedIndex = 0
-
     //Setup Request URL and headers
     const controllerURL = 'http://localhost:9000/api/DataDict/getTables'
     let headers = {
@@ -128,13 +120,12 @@ async function getControllers(controllerAuthToken) {
     let controllerArray = result.replace(/['"\[\]]+/g, '')
     controllerArray = controllerArray.split(",")
 
-    //Send response data to the controller dropdown on the page
-    let option    
+    //Send response data to the tables datalist on the page
+    let datalist = document.getElementById('tablesList')
     for (let i = 0; i < controllerArray.length; i++) {
-        option = document.createElement('option')
-        option.text = controllerArray[i]
+        let option = document.createElement('option')
         option.value = controllerArray[i]
-        dropdown.add(option)
+        datalist.appendChild(option)
     }
 };
 
@@ -143,7 +134,7 @@ async function getControllers(controllerAuthToken) {
 async function getRequest() {
 
     //Get controller name
-    let controllerName = document.getElementById('controllerDropdown').value
+    let controllerName = document.getElementById('tablesList').value
 
     //Get Input values from the form.  Will be used to build the rest of the GET Request URL
     let inputs = document.getElementsByClassName('getInput')
@@ -156,7 +147,7 @@ async function getRequest() {
     }
 
     //Setup GET Request URL and header info
-    const getURL = 'http://localhost:9000/rest/'
+    const getURL = 'http://localhost:9000/rest/dynamic/'
     let restURL = controllerName + '?'
     let headers = {
         auth_token: authToken
@@ -171,6 +162,8 @@ async function getRequest() {
     }
 
     restURL = restURL.slice(0, -1)  //Needed to remove the last '&' from the string
+    console.log(getURL + restURL)
+
 
     //Send the GET request
     let response = await fetch(getURL + restURL, {
