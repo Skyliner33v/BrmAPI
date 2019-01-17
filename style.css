@@ -52,8 +52,6 @@ article {
     padding: 5px;
     overflow: auto;
     background-color: whitesmoke;
-    display: flex;
-    flex-direction: column;
 }
 
 /*Style the form elements*/
@@ -86,4 +84,12 @@ article {
 #locality-dropdown {
     padding: 5px;
     margin-bottom: 20px;
+}
+
+#tableDiv {
+    display: none;
+}
+
+#hideGetNav {
+    display: none;
 }

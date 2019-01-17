@@ -32,9 +32,9 @@ async function getDB() {
     }
 };
 
+
 //Get list of Databases on page load to be used for the Authorization Request
 getDB();
-
 
 
 //Request Authorization token
@@ -43,6 +43,11 @@ async function getAuth() {
     //Get database id value from page
     let dbOption = document.getElementById('dbDropdown')
     let dbValue = dbOption.options[dbOption.selectedIndex].value
+
+    //Alert if no database is selected
+    if (dbValue === '' | dbValue === 'Null' | dbValue === 'Select a Database') {
+        return alert('Please Select a Database First')
+    }
 
     //Setup request url and header info
     const authURL = 'http://localhost:9000/api/auth/APILogin'
@@ -74,10 +79,26 @@ async function getAuth() {
     */
     authTimer()
 
-    //Get list of controllers available in the selected database
+    //Pass auth token and get list of controllers available in the selected database
     await getControllers(result.auth_token)
+    
+    let hideGetNav = document.getElementById('hideGetNav')
+    hideGetNav.style.display = 'block'
 };
 
+
+//Toggle Table Name Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
+let controllerSelected = document.getElementById('getControllers')
+controllerSelected.onchange = function (){
+    let hiddenDiv = document.getElementById('tableDiv')
+    let clearTableName = document.getElementById('getTables')
+    if(controllerSelected.value === 'Dynamic') {
+        hiddenDiv.style.display = 'block'
+    } else {
+        hiddenDiv.style.display = 'none'
+        clearTableName.selectedIndex = 0
+    }
+}
 
 
 //1200 second countdown timer to keep track of the authorization window.  Alert user and reset at end of timer. 
@@ -133,8 +154,18 @@ async function getControllers(controllerAuthToken) {
 //Send a GET Request passing in parameters if included
 async function getRequest() {
 
-    //Get controller name
-    let controllerName = document.getElementById('tablesList').value
+    //Get table and controller names
+    let tableName = document.getElementById('getTables').value
+    let controllerName = document.getElementById('getControllers').value
+
+    //Build the rest of the URL string
+    let restURL
+    
+    if(controllerName === 'Dynamic') {
+        
+    }
+
+
 
     //Get Input values from the form.  Will be used to build the rest of the GET Request URL
     let inputs = document.getElementsByClassName('getInput')
@@ -146,14 +177,7 @@ async function getRequest() {
         formValues[inputs[i].id] = inputs[i].value
     }
 
-    //Setup GET Request URL and header info
-    const getURL = 'http://localhost:9000/rest/dynamic/'
-    let restURL = controllerName + '?'
-    let headers = {
-        auth_token: authToken
-    }
-
-    //Append the values from the formValues array and build 2nd half of the URL string
+    //Append the values from the formValues array if using the Dynamic Controller
     for(let i in formValues) {
         if (formValues.hasOwnProperty(i)){
             if (formValues[i] === '') {continue;}
@@ -164,6 +188,13 @@ async function getRequest() {
     restURL = restURL.slice(0, -1)  //Needed to remove the last '&' from the string
     console.log(getURL + restURL)
 
+
+
+    //Setup GET Request URL and header info
+    const getURL = 'http://localhost:9000/rest/'
+    let headers = {
+        auth_token: authToken
+    }
 
     //Send the GET request
     let response = await fetch(getURL + restURL, {
