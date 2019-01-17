@@ -90,6 +90,6 @@ article {
     display: none;
 }
 
-#hideGetNav {
+#hideGetDiv, #hidePostDiv, #hidePutDiv, #hideDeleteDiv {
     display: none;
 }

@@ -52,7 +52,7 @@
             
             <nav>
                 <h2 id="getHeader">GET Request</h2>
-                <div id="hideGetNav">    
+                <div id="hideGetDiv">    
                     
                     <!--List of Available Controllers-->
                     <label for="controller">Select a Controller:</label>
@@ -216,9 +216,11 @@
         <section id="postSection">
             <nav>
                 <h2 id="postHeader">POST Request</h2>
-                <label for="post">Paste JSON into text box:</label><br>
-                <input type="text" class="inputBox" name="postInput"><br><br>
-                <button id="postButton" type="button">Send POST Request</button>
+                <div id="hidePostDiv">
+                    <label for="post">Paste JSON into text box:</label><br>
+                    <input type="text" class="inputBox" name="postInput"><br><br>
+                    <button id="postButton" type="button">Send POST Request</button>
+                </div>
             </nav>
 
             <article id="postArticle">
@@ -237,9 +239,11 @@
         <section id="putSection">
             <nav>
                 <h2 id="putHeader">PUT Request</h2>
-                <label for="put">Paste JSON into text box:</label><br>
-                <input type="text" class="inputBox" name="putInput"><br><br>
-                <button id="putButton" type="button">Send PUT Request</button>
+                <div id="hidePutDiv">
+                    <label for="put">Paste JSON into text box:</label><br>
+                    <input type="text" class="inputBox" name="putInput"><br><br>
+                    <button id="putButton" type="button">Send PUT Request</button>
+                </div>
             </nav>
 
             <article id="putArticle">
@@ -258,9 +262,11 @@
         <section id="deleteSection">
             <nav>
                 <h2 id="deleteHeader">DELETE Request</h2>
-                <label for="delete">Paste JSON into text box:</label><br>
-                <input type="text" class="inputBox" name="deleteInput"><br><br>
-                <button id="deleteButton" type="button">Send DELETE Request</button>
+                <div id="hideDeleteDiv">
+                    <label for="delete">Paste JSON into text box:</label><br>
+                    <input type="text" class="inputBox" name="deleteInput"><br><br>
+                    <button id="deleteButton" type="button">Send DELETE Request</button>
+                </div>
             </nav>
 
             <article id="deleteArticle">

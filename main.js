@@ -19,7 +19,9 @@ async function getDB() {
     const dbURL = 'http://localhost:9000/api/auth/GetDatabases'
 
     //Send request to get list of available databases and get back json data
-    let response = await fetch(dbURL, {method: 'GET'})
+    let response = await fetch(dbURL, {
+        method: 'GET'
+    })
     let result = await response.json()
 
     // Set response data to create and populate a dropdown list on the page
@@ -81,18 +83,24 @@ async function getAuth() {
 
     //Pass auth token and get list of controllers available in the selected database
     await getControllers(result.auth_token)
-    
-    let hideGetNav = document.getElementById('hideGetNav')
+
+    let hideGetNav = document.getElementById('hideGetDiv')
+    let hidePostDiv = document.getElementById('hidePostDiv')
+    let hidePutDiv = document.getElementById('hidePutDiv')
+    let hideDeleteDiv = document.getElementById('hideDeleteDiv')
     hideGetNav.style.display = 'block'
+    hidePostDiv.style.display = 'block'
+    hidePutDiv.style.display = 'block'
+    hideDeleteDiv.style.display = 'block'
 };
 
 
 //Toggle Table Name Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
 let controllerSelected = document.getElementById('getControllers')
-controllerSelected.onchange = function (){
+controllerSelected.onchange = function () {
     let hiddenDiv = document.getElementById('tableDiv')
     let clearTableName = document.getElementById('getTables')
-    if(controllerSelected.value === 'Dynamic') {
+    if (controllerSelected.value === 'Dynamic') {
         hiddenDiv.style.display = 'block'
     } else {
         hiddenDiv.style.display = 'none'
@@ -158,37 +166,36 @@ async function getRequest() {
     let tableName = document.getElementById('getTables').value
     let controllerName = document.getElementById('getControllers').value
 
-    //Build the rest of the URL string
+    //Build the middle of the URL string depending on if just a controller is selected, or the Dynamic controller is selected
     let restURL
-    
-    if(controllerName === 'Dynamic') {
-        
+
+    if (controllerName === 'Dynamic') {
+        restURL = 'Dynamic/' + tableName + '/?'
+    } else {
+        restURL = controllerName + '/?'
     }
-
-
 
     //Get Input values from the form.  Will be used to build the rest of the GET Request URL
     let inputs = document.getElementsByClassName('getInput')
     let formValues = {}
 
-    //Parse inputs and store in the formValues array
+    //Parse the query options inputs and store in the formValues array
     //Will need to add some error handling here for incorrectly formatted input
-    for(let i =0; i < inputs.length; i++) {
+    for (let i = 0; i < inputs.length; i++) {
         formValues[inputs[i].id] = inputs[i].value
     }
 
-    //Append the values from the formValues array if using the Dynamic Controller
-    for(let i in formValues) {
-        if (formValues.hasOwnProperty(i)){
-            if (formValues[i] === '') {continue;}
-                restURL += i + '=' + formValues[i] +'&'
+    //Append the values from the formValues array
+    for (let i in formValues) {
+        if (formValues.hasOwnProperty(i)) {
+            if (formValues[i] === '') {
+                continue;
+            }
+            restURL += i + '=' + formValues[i] + '&'
         }
     }
 
-    restURL = restURL.slice(0, -1)  //Needed to remove the last '&' from the string
-    console.log(getURL + restURL)
-
-
+    restURL = restURL.slice(0, -1) //Needed to remove the last '&' from the string
 
     //Setup GET Request URL and header info
     const getURL = 'http://localhost:9000/rest/'
@@ -207,6 +214,4 @@ async function getRequest() {
 
     //Post response data to page
     document.getElementById('getResponse').innerHTML = JSON.stringify(result, undefined, 2)
-    console.log(result)
-    
 };
