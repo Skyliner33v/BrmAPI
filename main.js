@@ -3,6 +3,108 @@
 //Initialize authorization token in a global context to be used in all requests.
 var authToken = "";
 
+//Initialize list of Controllers
+const controllerList = ["Dynamic"
+,"ActionTypeDefinition"
+,"AdvancedFormulaCategories"
+,"AdvancedFormulaParameters"
+,"AdvancedFormulas"
+,"AssessmentDefs"
+,"Assessment"
+,"AttributeDisplay"
+,"BenefitElements"
+,"BenefitFields"
+,"BenefitGroups"
+,"BenefitRisks"
+,"BridgeAnalysisGroup"
+,"BridgeAnalysisRoad"
+,"Bridge"
+,"Caption"
+,"Cicocntl"
+,"Cicoxcpt"
+,"CommonList"
+,"DataExchangeOption"
+,"ElementCategoryDefinition"
+,"ElementDeterioration"
+,"ElementStateDefinitions"
+,"ElemInsp"
+,"ExchangeOptionDetail"
+,"ExchangeOption"
+,"ExportStatus"
+,"FlexBenefit"
+,"FlexElem"
+,"InspectionStatus"
+,"MRRActionDefinition"
+,"NavigationTab"
+,"NavigationTask"
+,"NbiExportDef"
+,"NbiExportOption"
+,"NbiItem"
+,"Permissions"
+,"Report"
+,"ReportSecurity"
+,"RolesPermissions"
+,"SessionBatch"
+,"UserFilterLayout"
+,"EnvironmentDefinitions"
+,"Filter"
+,"GroupAccessFilters"
+,"Groups"
+,"ElementMaterialsDefs"
+,"Context"
+,"ContextTable"
+,"ControlGroupSecurity"
+,"Control"
+,"ControlSecurity"
+,"Group"
+,"ElementInspectionLegacy"
+,"ElementStateDefinition"
+,"Funding"
+,"FundingTargets"
+,"ElementChild"
+,"LanguageCaption"
+,"MetricEnglish"
+,"NavigationControlGroup"
+,"NavigationControl"
+,"Options"
+,"OptionsLookup"
+,"LayoutField"
+,"Layout"
+,"DataDict"
+,"ElementDefinitions"
+,"ElementInspection"
+,"ElementTypeDefs"
+,"FlexActionSet"
+,"HealthIndex"
+,"Inspection"
+,"MaintActivity"
+,"MaintEvent"
+,"Multimedia"
+,"Parameters"
+,"ProgramFunding"
+,"Program"
+,"ProjectBridge"
+,"ProjectCategoryaActions"
+,"ProjectCategory"
+,"ProjectFunding"
+,"ProjectMilestone"
+,"Project"
+,"ProjectPerformance"
+,"ProjectProgram"
+,"ProjectWorkItem"
+,"Roadway"
+,"Roles"
+,"StructureUnit"
+,"TabSecurity"
+,"TaskSecurity"
+,"UserGroups"
+,"User"
+,"UserPermissions"
+,"UserRoles"
+,"UtilityCriteriaCategory"
+,"UtilityCriteriaPoints"
+,"WorkCandidate"]
+
 
 //Fetch list of available databases
 async function getDB() {
@@ -81,8 +183,16 @@ async function getAuth() {
     */
     authTimer();
 
-    //Pass auth token and get list of controllers available in the selected database
-    await getControllers(result.auth_token);
+    //Populate list of controllers using controllerList List
+    let datalist = document.getElementById("controllersList");
+    for (let i = 0; i < controllerList.length; i++) {
+        let option = document.createElement("option")
+        option.value = controllerList[i]
+        datalist.appendChild(option)
+    };
+
+    //Pass auth token and get list of tables available in the selected database
+    await getTables(result.auth_token);
 
     let hideGetNav = document.getElementById("hideGetDiv");
     let hidePostDiv = document.getElementById("hidePostDiv");
@@ -92,20 +202,6 @@ async function getAuth() {
     hidePostDiv.style.display = "block";
     hidePutDiv.style.display = "block";
     hideDeleteDiv.style.display = "block";
-};
-
-
-//Toggle Table Name Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
-let controllerSelected = document.getElementById("getControllers");
-controllerSelected.onchange = function () {
-    let hiddenDiv = document.getElementById("tableDiv");
-    let clearTableName = document.getElementById("getTables");
-    if (controllerSelected.value === "Dynamic") {
-        hiddenDiv.style.display = "block"
-    } else {
-        hiddenDiv.style.display = "none"
-        clearTableName.selectedIndex = 0
-    };
 };
 
 
@@ -127,17 +223,18 @@ function authTimer() {
 
 
 
-//Get list of available controllers and populate a dropdown list for the GET requests
-async function getControllers(controllerAuthToken) {
+//Get list of available tables and populate a dropdown list for the GET requests
+async function getTables(controllerAuthToken) {
 
     //Setup Request URL and headers
-    const controllerURL = "http://localhost:9000/api/DataDict/getTables";
+    const tablesURL = "http://localhost:9000/api/DataDict/getTables";
     let headers = {
+        Accept: "application/JSON",
         auth_token: controllerAuthToken
     };
 
     //Send GET Request
-    let response = await fetch(controllerURL, {
+    let response = await fetch(tablesURL, {
         method: "GET",
         headers: headers
     });
@@ -146,17 +243,42 @@ async function getControllers(controllerAuthToken) {
     let result = await response.text();
 
     //Remove offending characters from the response and convert it to an actual array
-    let controllerArray = result.replace(/[""\[\]]+/g, "");
-    controllerArray = controllerArray.split(",");
+    let tableArray = result.replace(/[""\[\]]+/g, "");
+    tableArray = tableArray.split(",");
 
     //Send response data to the tables datalist on the page
     let datalist = document.getElementById("tablesList");
-    for (let i = 0; i < controllerArray.length; i++) {
+    for (let i = 0; i < tableArray.length; i++) {
         let option = document.createElement("option")
-        option.value = controllerArray[i]
+        option.value = tableArray[i]
         datalist.appendChild(option)
     };
 };
+
+
+
+//Toggle GET Request Table Name Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
+let getControllersList = document.getElementById("getControllers");
+getControllersList.onchange = function () {
+    let getHiddenDiv = document.getElementById("getTableDiv");
+    if (getControllersList.value === "Dynamic") {
+        getHiddenDiv.style.display = "block"
+    } else {
+        getHiddenDiv.style.display = "none"
+    };
+};
+
+//Toggle POST Request Table Name Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
+let postControllersList = document.getElementById("postControllers");
+postControllersList.onchange = function () {
+    let postHiddenDiv = document.getElementById("postTableDiv");
+    if (postControllersList.value === "Dynamic") {
+        postHiddenDiv.style.display = "block"
+    } else {
+        postHiddenDiv.style.display = "none"
+    };
+};
+
 
 
 //Send a GET Request passing in parameters if included
@@ -200,9 +322,9 @@ async function getRequest() {
     //Setup GET Request URL and header info
     const getURL = "http://localhost:9000/rest/";
     let headers = {
+        Accept: "application/JSON",
         auth_token: authToken
     };
-    console.log(getURL+restURL)
 
     //Send the GET request
     let response = await fetch(getURL + restURL, {
@@ -216,3 +338,5 @@ async function getRequest() {
     //Post response data to page
     document.getElementById("getResponse").innerHTML = JSON.stringify(result, undefined, 2);
 };
+
+

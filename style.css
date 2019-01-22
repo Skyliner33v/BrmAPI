@@ -75,7 +75,7 @@ article {
     height: 200px;
     overflow: auto;
     width: 90%;
-    padding: 10px
+    padding: 10px;
 }
 
 #authInput {
@@ -87,7 +87,7 @@ article {
     margin-bottom: 20px;
 }
 
-#tableDiv {
+#getTableDiv, #postTableDiv {
     display: none;
 }
 

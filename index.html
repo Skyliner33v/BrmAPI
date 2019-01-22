@@ -56,112 +56,11 @@
                     
                     <!--List of Available Controllers-->
                     <label for="controller">Select a Controller:</label>
-                    <input list="controllerList" id="getControllers" name="getControllers"></input>
-                    <datalist id="controllerList">
-                        <option value="Dynamic"></option> 
-                        <option value="ActionTypeDefinition"></option>
-                        <option value="AdvancedFormulaCategories"></option>
-                        <option value="AdvancedFormulaParameters"></option>
-                        <option value="AdvancedFormulas"></option>
-                        <option value="AssessmentDefs"></option>
-                        <option value="Assessment"></option>
-                        <option value="AttributeDisplay"></option>
-                        <option value="BenefitElements"></option>
-                        <option value="BenefitFields"></option>
-                        <option value="BenefitGroups"></option>
-                        <option value="BenefitRisks"></option>
-                        <option value="BridgeAnalysisGroup"></option>
-                        <option value="BridgeAnalysisRoad"></option>
-                        <option value="Bridge"></option>
-                        <option value="Caption"></option>
-                        <option value="Cicocntl"></option>
-                        <option value="Cicoxcpt"></option>
-                        <option value="CommonList"></option>
-                        <option value="DataExchangeOption"></option>
-                        <option value="ElementCategoryDefinition"></option>
-                        <option value="ElementDeterioration"></option>
-                        <option value="ElementStateDefinitions"></option>
-                        <option value="ElemInsp"></option>
-                        <option value="ExchangeOptionDetail"></option>
-                        <option value="ExchangeOption"></option>
-                        <option value="ExportStatus"></option>
-                        <option value="FlexBenefit"></option>
-                        <option value="FlexElem"></option>
-                        <option value="InspectionStatus"></option>
-                        <option value="MRRActionDefinition"></option>
-                        <option value="NavigationTab"></option>
-                        <option value="NavigationTask"></option>
-                        <option value="NbiExportDef"></option>
-                        <option value="NbiExportOption"></option>
-                        <option value="NbiItem"></option>
-                        <option value="Permissions"></option>
-                        <option value="Report"></option>
-                        <option value="ReportSecurity"></option>
-                        <option value="RolesPermissions"></option>
-                        <option value="SessionBatch"></option>
-                        <option value="UserFilterLayout"></option>
-                        <option value="EnvironmentDefinitions"></option>
-                        <option value="Filter"></option>
-                        <option value="GroupAccessFilters"></option>
-                        <option value="Groups"></option>
-                        <option value="ElementMaterialsDefs"></option>
-                        <option value="Context"></option>
-                        <option value="ContextTable"></option>
-                        <option value="ControlGroupSecurity"></option>
-                        <option value="Control"></option>
-                        <option value="ControlSecurity"></option>
-                        <option value="Group"></option>
-                        <option value="ElementInspectionLegacy"></option>
-                        <option value="ElementStateDefinition"></option>
-                        <option value="Funding"></option>
-                        <option value="FundingTargets"></option>
-                        <option value="ElementChild"></option>
-                        <option value="LanguageCaption"></option>
-                        <option value="MetricEnglish"></option>
-                        <option value="NavigationControlGroup"></option>
-                        <option value="NavigationControl"></option>
-                        <option value="Options"></option>
-                        <option value="OptionsLookup"></option>
-                        <option value="LayoutField"></option>
-                        <option value="Layout"></option>
-                        <option value="DataDict"></option>
-                        <option value="ElementDefinitions"></option>
-                        <option value="ElementInspection"></option>
-                        <option value="ElementTypeDefs"></option>
-                        <option value="FlexActionSet"></option>
-                        <option value="HealthIndex"></option>
-                        <option value="Inspection"></option>
-                        <option value="MaintActivity"></option>
-                        <option value="MaintEvent"></option>
-                        <option value="Multimedia"></option>
-                        <option value="Parameters"></option>
-                        <option value="ProgramFunding"></option>
-                        <option value="Program"></option>
-                        <option value="ProjectBridge"></option>
-                        <option value="ProjectCategoryaActions"></option>
-                        <option value="ProjectCategory"></option>
-                        <option value="ProjectFunding"></option>
-                        <option value="ProjectMilestone"></option>
-                        <option value="Project"></option>
-                        <option value="ProjectPerformance"></option>
-                        <option value="ProjectProgram"></option>
-                        <option value="ProjectWorkItem"></option>
-                        <option value="Roadway"></option>
-                        <option value="Roles"></option>
-                        <option value="StructureUnit"></option>
-                        <option value="TabSecurity"></option>
-                        <option value="TaskSecurity"></option>
-                        <option value="UserGroups"></option>
-                        <option value="User"></option>
-                        <option value="UserPermissions"></option>
-                        <option value="UserRoles"></option>
-                        <option value="UtilityCriteriaCategory"></option>
-                        <option value="UtilityCriteriaPoints"></option>
-                        <option value="WorkCandidate"></option>
-                    </datalist><br>
+                    <input list="controllersList" id="getControllers" name="getControllers"></input>
+                    <datalist id="controllersList"></datalist><br>
                     
                     <!--List of available table names.  Only populated if the "Dynamic" controller is selected above-->
-                    <div id="tableDiv">
+                    <div id="getTableDiv">
                         <label for="tableName">Select a Table:</label>
                         <input list="tablesList" id="getTables" name="getTables">
                         <datalist id="tablesList"></datalist>
@@ -217,6 +116,19 @@
             <nav>
                 <h2 id="postHeader">POST Request</h2>
                 <div id="hidePostDiv">
+                    <!--List of Available Controllers-->
+                    <label for="controller">Select a Controller:</label>
+                    <input list="controllersList" id="postControllers" name="postControllers"></input>
+                    <datalist id="controllersList"></datalist><br>
+                    
+                    <!--List of available table names.  Only populated if the "Dynamic" controller is selected above-->
+                    <div id="postTableDiv">
+                        <label for="tableName">Select a Table:</label>
+                        <input list="tablesList" id="getTables" name="getTables">
+                        <datalist id="tablesList"></datalist>
+                        <p><small>(Select a table only if the Dynamic Controller is selected)</small></p>
+                    </div>  
+
                     <label for="post">Paste JSON into text box:</label><br>
                     <textarea class="inputBox" name="postInput"></textarea>
                     <button id="postButton" type="button">Send POST Request</button>
