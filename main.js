@@ -172,7 +172,7 @@ async function getRequest() {
     if (controllerName === "Dynamic") {
         restURL = "Dynamic/" + tableName + "/?"
     } else {
-        restURL = controllerName + "/?"
+        restURL = controllerName + "?"
     };
 
     //Get Input values from the form.  Will be used to build the rest of the GET Request URL
@@ -196,12 +196,13 @@ async function getRequest() {
     };
 
     restURL = restURL.slice(0, -1) //Needed to remove the last "&" from the string
-
+    
     //Setup GET Request URL and header info
     const getURL = "http://localhost:9000/rest/";
     let headers = {
         auth_token: authToken
     };
+    console.log(getURL+restURL)
 
     //Send the GET request
     let response = await fetch(getURL + restURL, {

@@ -27,6 +27,7 @@ section {
     display: -webkit-flex;
     display: flex;
     max-height: 400px;
+    align-items: top;
 }
 
 /* Stack containers on top of each other*/
@@ -73,8 +74,8 @@ article {
 .inputBox {
     height: 200px;
     overflow: auto;
-    width: 100%;
-    text-align: left;
+    width: 90%;
+    padding: 10px
 }
 
 #authInput {
