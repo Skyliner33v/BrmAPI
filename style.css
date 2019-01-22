@@ -26,7 +26,7 @@ header {
 section {
     display: -webkit-flex;
     display: flex;
-    max-height: 400px;
+    max-height: 500px;
     align-items: top;
 }
 
@@ -87,7 +87,7 @@ article {
     margin-bottom: 20px;
 }
 
-#getTableDiv, #postTableDiv {
+#getTableDiv, #postTableDiv, #putTableDiv, #deleteTableDiv {
     display: none;
 }
 

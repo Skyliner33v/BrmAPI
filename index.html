@@ -116,6 +116,7 @@
             <nav>
                 <h2 id="postHeader">POST Request</h2>
                 <div id="hidePostDiv">
+
                     <!--List of Available Controllers-->
                     <label for="controller">Select a Controller:</label>
                     <input list="controllersList" id="postControllers" name="postControllers"></input>
@@ -124,7 +125,7 @@
                     <!--List of available table names.  Only populated if the "Dynamic" controller is selected above-->
                     <div id="postTableDiv">
                         <label for="tableName">Select a Table:</label>
-                        <input list="tablesList" id="getTables" name="getTables">
+                        <input list="tablesList" id="postTables" name="postTables">
                         <datalist id="tablesList"></datalist>
                         <p><small>(Select a table only if the Dynamic Controller is selected)</small></p>
                     </div>  
@@ -152,6 +153,20 @@
             <nav>
                 <h2 id="putHeader">PUT Request</h2>
                 <div id="hidePutDiv">
+
+                    <!--List of Available Controllers-->
+                    <label for="controller">Select a Controller:</label>
+                    <input list="controllersList" id="putControllers" name="putControllers"></input>
+                    <datalist id="controllersList"></datalist><br>
+
+                    <!--List of available table names.  Only populated if the "Dynamic" controller is selected above-->
+                    <div id="putTableDiv">
+                        <label for="tableName">Select a Table:</label>
+                        <input list="tablesList" id="putTables" name="putTables">
+                        <datalist id="tablesList"></datalist>
+                        <p><small>(Select a table only if the Dynamic Controller is selected)</small></p>
+                    </div>  
+
                     <label for="put">Paste JSON into text box:</label><br>
                     <textarea class="inputBox" name="putInput"></textarea>
                     <button id="putButton" type="button">Send PUT Request</button>
@@ -175,6 +190,20 @@
             <nav>
                 <h2 id="deleteHeader">DELETE Request</h2>
                 <div id="hideDeleteDiv">
+
+                    <!--List of Available Controllers-->
+                    <label for="controller">Select a Controller:</label>
+                    <input list="controllersList" id="deleteControllers" name="deleteControllers"></input>
+                    <datalist id="controllersList"></datalist><br>
+
+                    <!--List of available table names.  Only populated if the "Dynamic" controller is selected above-->
+                    <div id="deleteTableDiv">
+                        <label for="tableName">Select a Table:</label>
+                        <input list="tablesList" id="deleteTables" name="deleteTables">
+                        <datalist id="tablesList"></datalist>
+                        <p><small>(Select a table only if the Dynamic Controller is selected)</small></p>
+                    </div>
+
                     <label for="delete">Paste JSON into text box:</label><br>
                     <textarea class="inputBox" name="deleteInput"></textarea>
                     <button id="deleteButton" type="button">Send DELETE Request</button>

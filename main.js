@@ -106,7 +106,7 @@ const controllerList = ["Dynamic"
 ,"WorkCandidate"]
 
 
-//Fetch list of available databases
+//Fetch list of available databases and populate the dropdown
 async function getDB() {
 
     //Setup dropdown stuff
@@ -141,7 +141,9 @@ async function getDB() {
 getDB();
 
 
-//Request Authorization token
+/*Request Authorization token, start the timer, populate list of Controllers in the dropdown
+Unhide other Request option containers, and send a request for list of available tables for the Dynamic Controller*/
+//TODO: Break this up into smaller functions
 async function getAuth() {
 
     //Get database id value from page
@@ -256,8 +258,8 @@ async function getTables(controllerAuthToken) {
 };
 
 
-
-//Toggle GET Request Table Name Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
+//TODO: Rewrite this section as a single function
+//Toggle GET Request Table Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
 let getControllersList = document.getElementById("getControllers");
 getControllersList.onchange = function () {
     let getHiddenDiv = document.getElementById("getTableDiv");
@@ -268,7 +270,7 @@ getControllersList.onchange = function () {
     };
 };
 
-//Toggle POST Request Table Name Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
+//Toggle POST Request Table Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
 let postControllersList = document.getElementById("postControllers");
 postControllersList.onchange = function () {
     let postHiddenDiv = document.getElementById("postTableDiv");
@@ -276,6 +278,28 @@ postControllersList.onchange = function () {
         postHiddenDiv.style.display = "block"
     } else {
         postHiddenDiv.style.display = "none"
+    };
+};
+
+//Toggle PUT Request Table Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
+let putControllersList = document.getElementById("putControllers");
+putControllersList.onchange = function () {
+    let putHiddenDiv = document.getElementById("putTableDiv");
+    if (putControllersList.value === "Dynamic") {
+        putHiddenDiv.style.display = "block"
+    } else {
+        putHiddenDiv.style.display = "none"
+    };
+};
+
+//Toggle DELETE Request Table Dropdown.  Display only if the "Dynamic" controller is selected and hide otherwise
+let deleteControllersList = document.getElementById("deleteControllers");
+deleteControllersList.onchange = function () {
+    let deleteHiddenDiv = document.getElementById("deleteTableDiv");
+    if (deleteControllersList.value === "Dynamic") {
+        deleteHiddenDiv.style.display = "block"
+    } else {
+        deleteHiddenDiv.style.display = "none"
     };
 };
 
