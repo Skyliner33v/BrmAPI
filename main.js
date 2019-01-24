@@ -331,7 +331,7 @@ async function getRequest() {
         formValues[inputs[i].id] = inputs[i].value
     };
 
-    //Append the values from the formValues array
+    //Append the values from the formValues array if a value has been entered
     for (let i in formValues) {
         if (formValues.hasOwnProperty(i)) {
             if (formValues[i] === "") {
@@ -360,7 +360,84 @@ async function getRequest() {
     let result = await response.json();
 
     //Post response data to page
-    document.getElementById("getResponse").innerHTML = JSON.stringify(result, undefined, 2);
+    //document.getElementById("getResponse").innerHTML = JSON.stringify(result, undefined, 2);
+
+    //Post response data to page as a Table
+    //TODO: Separate this into a separate function
+    let col = [];
+    for (let i =0; i < result.length; i++) {
+        for (let key in result[i]) {
+            if (col.indexOf(key) === -1) {
+                col.push(key);
+            }
+        };
+    };
+
+    let table = document.createElement("table");
+    let tr = table.insertRow(-1);
+
+    for (let i = 0; i < col.length; i++) {
+        let th = document.createElement("th");
+        th.innerHTML = col[i];
+        tr.appendChild(th);
+    }
+
+    // ADD JSON DATA TO THE TABLE AS ROWS.
+    for (let i = 0; i < result.length; i++) {
+
+        tr = table.insertRow(-1);
+
+        for (let j = 0; j < col.length; j++) {
+            let tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = result[i][col[j]];
+        }
+    }
+
+    let divContainer = document.getElementById("showData");
+    divContainer.innerHTML = "";
+    divContainer.appendChild(table);
 };
 
 
+//Send Post Request
+async function postRequest() {
+
+    //Get table and controller names
+    let tableName = document.getElementById("postTables").value;
+    let controllerName = document.getElementById("postControllers").value;
+
+    //Build the middle of the URL string depending on if just a controller is selected, or the Dynamic controller is selected
+    let restURL;
+
+    if (controllerName === "Dynamic") {
+        restURL = "Dynamic/" + tableName + "/"
+    } else {
+        restURL = controllerName + "/"
+    };
+
+    //Setup GET Request URL and header info
+    const postURL = "http://localhost:9000/rest/";
+    let headers = {
+        "Accept": "application/JSON",
+        "Content-Type": "application/JSON",
+        "auth_token": authToken
+    };
+
+    //Get JSON formatted input from page
+    let postInput = document.getElementById("postInput").value
+    //let body = JSON.stringify(postInput);    
+
+    //Send the GET request
+    let response = await fetch(postURL + restURL, {
+        "method": "POST",
+        "headers": headers,
+        "body": postInput
+    });
+
+    //Process response
+    let result = await response.json();
+    console.log(result);
+
+    //Post response data to page
+    document.getElementById("postResponse").innerHTML = JSON.stringify(result, undefined, 2);
+};

@@ -55,6 +55,20 @@ article {
     background-color: whitesmoke;
 }
 
+table, th, td 
+{
+    border: solid 1px #DDD;
+    border-collapse: collapse;
+    padding: 2px 3px;
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+th {
+    font-weight:bold;
+}
+
 /*Style the form elements*/
 .formWrapper {
     list-style-type: none;

@@ -48,8 +48,7 @@
             <h2>GET Request</h2>
         </header>
 
-        <section id="getSection">
-            
+        <section id="getSection">            
             <nav>
                 <h2 id="getHeader">GET Request</h2>
                 <div id="hideGetDiv">    
@@ -68,7 +67,6 @@
                     </div>    
 
                     <h1>Enter Query String Options</h1>
-
                     <form id="getInputsForm">
                         <ul class="formWrapper">
                             <li  class="getInputList">
@@ -98,10 +96,12 @@
                 </div>
             </nav>
             
-
             <article id="getArticle">
                 <h1>GET Response:</h1>
-                <pre id="getResponse"></pre>
+                <!--<pre id="getResponse"></pre>-->
+                    <div id="showDataContainer">
+                        <p id="showData"></p>
+                    </div>
             </article>
         </section>
     </div>
@@ -131,8 +131,8 @@
                     </div>  
 
                     <label for="post">Paste JSON into text box:</label><br>
-                    <textarea class="inputBox" name="postInput"></textarea>
-                    <button id="postButton" type="button">Send POST Request</button>
+                    <textarea class="inputBox" name="postInput" id="postInput"></textarea>
+                    <button id="postButton" type="button" onclick="postRequest()">Send POST Request</button>
                 </div>
             </nav>
 
@@ -152,8 +152,8 @@
         <section id="putSection">
             <nav>
                 <h2 id="putHeader">PUT Request</h2>
-                <div id="hidePutDiv">
 
+                <div id="hidePutDiv">
                     <!--List of Available Controllers-->
                     <label for="controller">Select a Controller:</label>
                     <input list="controllersList" id="putControllers" name="putControllers"></input>
@@ -189,8 +189,8 @@
         <section id="deleteSection">
             <nav>
                 <h2 id="deleteHeader">DELETE Request</h2>
-                <div id="hideDeleteDiv">
 
+                <div id="hideDeleteDiv">
                     <!--List of Available Controllers-->
                     <label for="controller">Select a Controller:</label>
                     <input list="controllersList" id="deleteControllers" name="deleteControllers"></input>
