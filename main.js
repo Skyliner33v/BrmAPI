@@ -243,6 +243,7 @@ async function getTables(controllerAuthToken) {
 
     //Process response
     let result = await response.text();
+    
 
     //Remove offending characters from the response and convert it to an actual array
     let tableArray = result.replace(/[""\[\]]+/g, "");
@@ -355,15 +356,20 @@ async function getRequest() {
         method: "GET",
         headers: headers
     });
+    console.log(getURL + restURL);
 
     //Process response
     let result = await response.json();
+    console.log(Object.keys(result));
 
     //Post response data to page
     //document.getElementById("getResponse").innerHTML = JSON.stringify(result, undefined, 2);
 
+
     //Post response data to page as a Table
     //TODO: Separate this into a separate function
+
+    //Build List of Column Headings
     let col = [];
     for (let i =0; i < result.length; i++) {
         for (let key in result[i]) {
@@ -373,6 +379,7 @@ async function getRequest() {
         };
     };
 
+    //Build the table using the Column Headings
     let table = document.createElement("table");
     let tr = table.insertRow(-1);
 
@@ -382,7 +389,7 @@ async function getRequest() {
         tr.appendChild(th);
     }
 
-    // ADD JSON DATA TO THE TABLE AS ROWS.
+    //Add the values to the rows
     for (let i = 0; i < result.length; i++) {
 
         tr = table.insertRow(-1);
@@ -393,7 +400,8 @@ async function getRequest() {
         }
     }
 
-    let divContainer = document.getElementById("showData");
+    //Display table on the page
+    let divContainer = document.getElementById("showGetData");
     divContainer.innerHTML = "";
     divContainer.appendChild(table);
 };
