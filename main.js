@@ -356,11 +356,9 @@ async function getRequest() {
         method: "GET",
         headers: headers
     });
-    console.log(getURL + restURL);
 
     //Process response
     let result = await response.json();
-    console.log(Object.keys(result));
 
     //Post response data to page
     //document.getElementById("getResponse").innerHTML = JSON.stringify(result, undefined, 2);
@@ -444,7 +442,6 @@ async function postRequest() {
 
     //Process response
     let result = await response.json();
-    console.log(result);
 
     //Post response data to page
     document.getElementById("postResponse").innerHTML = JSON.stringify(result, undefined, 2);
