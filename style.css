@@ -96,11 +96,6 @@ th {
     margin-bottom: 40px;
 }
 
-#locality-dropdown {
-    padding: 5px;
-    margin-bottom: 20px;
-}
-
 #getTableDiv, #postTableDiv, #putTableDiv, #deleteTableDiv {
     display: none;
 }

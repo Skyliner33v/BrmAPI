@@ -229,7 +229,13 @@
 
         <section id="assetManagementSection">
             <nav>
-                <h2 id="assetManagementHeader">GET Request</h2>                    
+                <!--List of Available Controllers-->
+                <h2 id="assetManagementHeader">GET Request</h2>
+
+                <label for="amController">Select a Controller:</label>
+                <input list="amControllersList" id="getAmControllers" name="getAmControllers"></input>
+                <datalist id="amControllersList"></datalist><br>
+
                 <button id="assetManagementButton" type="button">Send GET Request</button>
             </nav>
 

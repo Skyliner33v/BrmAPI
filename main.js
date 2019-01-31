@@ -446,3 +446,20 @@ async function postRequest() {
     //Post response data to page
     document.getElementById("postResponse").innerHTML = JSON.stringify(result, undefined, 2);
 };
+
+
+
+
+
+/**********Asset Management Section*************/
+
+//Define list of controllers
+const amControllerList = ["bridges", "inspections", "elementDefinitions"]
+
+//Populate list of controllers using amControllerList List
+let datalist = document.getElementById("amControllersList");
+for (let i = 0; i < amControllerList.length; i++) {
+    let option = document.createElement("option")
+    option.value = amControllerList[i]
+    datalist.appendChild(option)
+};
