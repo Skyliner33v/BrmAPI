@@ -463,3 +463,54 @@ for (let i = 0; i < amControllerList.length; i++) {
     option.value = amControllerList[i]
     datalist.appendChild(option)
 };
+
+
+//Setup Get Request
+async function getAmRequest() {
+    let controllerName = document.getElementById("getAmControllers").value;
+
+    //Setup GET Request URL and header info
+    const getURL = "http://localhost:8081/api/" + controllerName;
+
+    let response = await fetch(getURL, {
+        method: "GET",
+    });
+
+    //Process response
+    let result = await response.json();
+
+    //Post response data to page
+    document.getElementById("assetManagementResponse").innerHTML = JSON.stringify(result, undefined, 2);
+};
+
+
+
+
+
+
+/* Hold for future use to compare JSON objects
+
+var compareJSON = function(obj1, obj2) {
+var ret = {};
+for(var i in obj2) {
+    if(!obj1.hasOwnProperty(i) || obj2[i] !== obj1[i]) {
+        ret[i] = obj2[i];
+    }
+}
+return ret;
+};
+
+var a = { 
+"Field A":"1", 
+"Field B":"2", 
+"Field D":"Something", 
+"Field E":"6" 
+};
+
+var b = { 
+"Field A":"1", 
+"Field B":"2", 
+"Field C":"3", 
+"Field D":"Different" 
+};
+*/
