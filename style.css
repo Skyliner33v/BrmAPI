@@ -3,7 +3,7 @@ body {
 }
 
 /* Center the main Heading */
-#mainHeaderDiv {
+.header {
     text-align: center
 }
 

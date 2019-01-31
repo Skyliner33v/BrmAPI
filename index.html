@@ -16,7 +16,7 @@
 <body>
 
     <!--Main Heading-->
-    <div id="mainHeaderDiv">
+    <div id="brmHeader" class="header">
         <h1>WSDOT BrM API Requests Testing</h1>
     </div>
 
@@ -213,6 +213,29 @@
             <article id="deleteArticle">
                 <h1>DELETE Response:</h1>
                 <pre id="deleteResponse"></pre>
+            </article>
+        </section>
+    </div><br><br>
+
+    <div id="mainAssetManagementHeaderDiv" class="header">
+        <h1>WSDOT Asset Management API Get Requests Testing</h1>
+    </div>
+
+    <!--AssetManagment API section-->
+    <div id="assetManagementDiv" class="cards">
+        <header id="assetManagementHeader">
+            <h2>GET Requests only</h2>
+        </header>
+
+        <section id="assetManagementSection">
+            <nav>
+                <h2 id="assetManagementHeader">GET Request</h2>                    
+                <button id="assetManagementButton" type="button">Send GET Request</button>
+            </nav>
+
+            <article id="assetManagementArticle">
+                <h1> Response:</h1>
+                <pre id="assetManagementResponse"></pre>
             </article>
         </section>
     </div>
