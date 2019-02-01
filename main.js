@@ -465,13 +465,14 @@ for (let i = 0; i < amControllerList.length; i++) {
 };
 
 
-//Setup Get Request
+//Send Get Request to AssetManagement API
 async function getAmRequest() {
     let controllerName = document.getElementById("getAmControllers").value;
 
     //Setup GET Request URL and header info
     const getURL = "http://localhost:8081/api/" + controllerName;
 
+    //Send GET Request
     let response = await fetch(getURL, {
         method: "GET",
     });
@@ -482,6 +483,71 @@ async function getAmRequest() {
     //Post response data to page
     document.getElementById("assetManagementResponse").innerHTML = JSON.stringify(result, undefined, 2);
 };
+
+
+
+
+/*Validate Data between the BrM Tables and the AssetManagement Tables
+Function will send GET requests to both API's, and compare the responses to see if there are any differences
+Usually the AssetManagement tables will have the newest data
+This can easily be extended to form POST requests to the BrM tables as a way to update them with the newest data*/ 
+async function validateData() {
+
+    //Get controller name to compare
+    let controllerName = document.getElementById("validateControllers").value;
+    
+    //Setup BrM API Get Request
+    const getURL = "http://localhost:9000/rest/";
+    let headers = {
+        Accept: "application/JSON",
+        auth_token: authToken
+    };
+
+    //Setup rest of the URL depending on which controller is selected
+    let restURL
+    
+    switch(controllerName) {
+        case "bridges":
+            restURL = "bridge";
+            break;
+        case "inspections":
+            restURL =  "inspection";
+            break;
+        case "elementDefinitions":
+            restURL =  "ElementDefinitions";
+            break;
+    };
+    
+    //Send BrM API Get Request
+    let brmResponse = await fetch(getURL + restURL, {
+        method: "GET",
+        headers: headers
+    });
+    
+    //Process response and store it for now
+    let brmResult = await brmResponse.json();
+    
+
+    //Setup AssetManagement API Get Request
+    const getURL = "http://localhost:8081/api/" + controllerName;
+
+    //Send AssetManagement API Get Request
+    let amResponse = await fetch(getURL, {
+        method: "GET",
+    });
+
+    //Process response and store it for now
+    let amResult = await amResponse.json();
+
+
+
+    
+};
+
+
+
+
+
 
 
 
