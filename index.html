@@ -244,6 +244,35 @@
                 <pre id="assetManagementResponse"></pre>
             </article>
         </section>
+    </div><br><br>
+
+    <div id="mainAssetManagementHeaderDiv" class="header">
+        <h1>Validation Testing</h1>
+    </div>
+
+    <!--Data Validation section-->
+    <div id="validateDiv" class="cards">
+        <header id="validateHeader">
+            <h2>Compare BrM and AssetManagement Tables</h2>
+        </header>
+
+        <section id="validateSection">
+            <nav>
+                <!--List of Available Controllers-->
+                <h2 id="validateHeader">Table Selection</h2>
+
+                <label for="validateController">Select a Table to Compare:</label>
+                <input list="validateControllersList" id="getValidateControllers" name="getValidateControllers"></input>
+                <datalist id="amControllersList"></datalist><br>
+
+                <button id="validateButton" type="button" onclick="validateData()">Validate Table</button>
+            </nav>
+
+            <article id="validateArticle">
+                <h1> Response:</h1>
+                <pre id="validateResponse"></pre>
+            </article>
+        </section>
     </div>
 
     <!-- Use separate javascript file in the folder -->
