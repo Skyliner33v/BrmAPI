@@ -497,7 +497,7 @@ async function validateData() {
     let controllerName = document.getElementById("validateControllers").value;
     
     //Setup BrM API Get Request
-    const getURL = "http://localhost:9000/rest/";
+    const getBrmURL = "http://localhost:9000/rest/";
     let headers = {
         Accept: "application/JSON",
         auth_token: authToken
@@ -511,7 +511,7 @@ async function validateData() {
             restURL = "bridge";
             break;
         case "inspections":
-            restURL =  "inspection";
+            restURL =  "inspection?t=100";
             break;
         case "elementDefinitions":
             restURL =  "ElementDefinitions";
@@ -519,64 +519,45 @@ async function validateData() {
     };
     
     //Send BrM API Get Request
-    let brmResponse = await fetch(getURL + restURL, {
+    let brmResponse = await fetch(getBrmURL + restURL, {
         method: "GET",
         headers: headers
     });
     
     //Process response and store it for now
     let brmResult = await brmResponse.json();
-    
 
     //Setup AssetManagement API Get Request
-    const getURL = "http://localhost:8081/api/" + controllerName;
+    const getAmURL = "http://localhost:8081/api/" + controllerName;
 
     //Send AssetManagement API Get Request
-    let amResponse = await fetch(getURL, {
+    let amResponse = await fetch(getAmURL, {
         method: "GET",
     });
 
     //Process response and store it for now
     let amResult = await amResponse.json();
+    console.log(JSON.stringify(brmResult))
+    console.log("break")
+    console.log(JSON.stringify(amResult))
+    console.log("break")
 
-
+    //compareJSON(brmResult, amResult)
 
     
 };
 
+//Compare JSON Objects from validateData().  Looks at the GUIDs from both tables to determine which guids are missing
 
-
-
-
-
-
-
-
-
-
-/* Hold for future use to compare JSON objects
-
-var compareJSON = function(obj1, obj2) {
-var ret = {};
-for(var i in obj2) {
-    if(!obj1.hasOwnProperty(i) || obj2[i] !== obj1[i]) {
-        ret[i] = obj2[i];
+function compareJSON(obj1, obj2) {
+    var ret = {};
+    for (var i in obj2) {
+        if (obj2[i]["INSPEVNT_GD"] !== obj1[i]["INSPEVNT_GD"]) {
+            ret[i] = obj2[i];
+        }
     }
-}
-return ret;
+    console.log(JSON.stringify(ret));
 };
 
-var a = { 
-"Field A":"1", 
-"Field B":"2", 
-"Field D":"Something", 
-"Field E":"6" 
-};
 
-var b = { 
-"Field A":"1", 
-"Field B":"2", 
-"Field C":"3", 
-"Field D":"Different" 
-};
-*/
+

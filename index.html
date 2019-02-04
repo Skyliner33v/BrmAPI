@@ -275,6 +275,29 @@
         </section>
     </div>
 
+    <!--Data Import section-->
+    <div id="importDiv" class="cards">
+        <header id="importHeader">
+            <h2>Compare BrM and AssetManagement Tables</h2>
+        </header>
+
+        <section id="importSection">
+            <nav>
+                <!--List of Available Controllers-->
+                <h2 id="importHeader">Table Selection</h2>
+                <button id="importBridgesBtn" type="button" onclick="updateBridges()">Update Bridges</button>
+                <button id="importInspectionsBtn" type="button" onclick="updateInspections()">Update Inspections </button>
+                <button id="importElemDataBtn" type="button" onclick="updateElemData()">Update Element Data </button>
+                <button id="importElemDefsBtn" type="button" onclick="updateElemDefs()">Update Element Definitions </button>
+            </nav>
+
+            <article id="importArticle">
+                <h1> Response:</h1>
+                <pre id="importResponse"></pre>
+            </article>
+        </section>
+    </div>
+
     <!-- Use separate javascript file in the folder -->
     <script src="main.js"></script>
 </body>
