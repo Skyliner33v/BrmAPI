@@ -285,10 +285,12 @@
             <nav>
                 <!--List of Available Controllers-->
                 <h2 id="importHeader">Table Selection</h2>
-                <button id="importBridgesBtn" type="button" onclick="updateBridges()">Update Bridges</button>
-                <button id="importInspectionsBtn" type="button" onclick="updateInspections()">Update Inspections </button>
-                <button id="importElemDataBtn" type="button" onclick="updateElemData()">Update Element Data </button>
-                <button id="importElemDefsBtn" type="button" onclick="updateElemDefs()">Update Element Definitions </button>
+                <div id="importButtons" class="stackButtons">
+                    <button id="importBridgesBtn" type="button" onclick="updateBridges()">Update Bridges</button>
+                    <button id="importInspectionsBtn" type="button" onclick="updateInspections()">Update Inspections </button>
+                    <button id="importElemDataBtn" type="button" onclick="updateElemData()">Update Element Data </button>
+                    <button id="importElemDefsBtn" type="button" onclick="updateElemDefs()">Update Element Definitions </button>
+                </div>
             </nav>
 
             <article id="importArticle">

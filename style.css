@@ -39,6 +39,17 @@ section {
     }
 }
 
+.stackButtons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+button {
+    padding: 5px;
+    margin: 2px;
+}
+
 /* Style the navigation menu */
 nav {
     flex: 1;
