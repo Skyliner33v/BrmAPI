@@ -66,3 +66,9 @@ async function getAuth() {
 };
 
 
+
+//Send GET request to 
+async function sendBrmGet() {
+    let authToken = getAuth();
+    
+}
