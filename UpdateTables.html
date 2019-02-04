@@ -2,6 +2,7 @@
 <html>
 
 <!-- Basic Header Information -->
+
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
     <meta charset="utf-8">
@@ -13,7 +14,37 @@
 
 
 <!-- Body -->
+
 <body>
+    <!--Main Heading-->
+    <div id="mainHeader" class="header">
+        <h1>WSDOT BrM API Requests Testing</h1>
+    </div>
+
+    <div id="dbSelectDiv" class="cards">
+        <header id="dbSelectHeader">
+            <h2>To Begin, Select a Database</h2>
+        </header>
+        <select id="dbDropdown" name="dbSelect"></select><br>
+    </div>
+
+    <!--Update Tables section-->
+    <div id="updateDiv" class="cards">
+        <header id="updateHeader">
+            <h2>Update AssetManagement Tables</h2>
+        </header>
+
+        <section id="updateSection">
+            <nav id="updateNav">
+                <h2 id="updateNavHeader">Select a Table to Update</h2><br>
+            </nav>
+
+            <article id="updateArticle">
+                <h1>Response:</h1>
+                <pre id="updateResponse"></p>
+            </article>
+        </section>
+    </div>
 
 
 
