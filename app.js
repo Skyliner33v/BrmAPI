@@ -43,33 +43,43 @@ getDB();
 function getDbValue() {
     const dbOption = document.getElementById("dbDropdown");
     const dbValue = dbOption.options[dbOption.selectedIndex].value;
-    return dbValue;
+    if (dbValue != "bridges" || dbValue != "inspections" || dbValue != "elementInspection" || dbValue != "elementDefinitions") {
+        alert("Please select a Database first");
+        return false;
+    } else {
+        return dbValue;
+    }
 };
 
 
 //Request authorization token
 async function getAuth() {
-
+    
     //Get database value
     const dbValue = getDbValue();
+
+    if (dbValue != false) {    
+        //Setup request url and header info
+        const authURL = "http://localhost:9000/api/auth/APILogin";
+        const headers = {
+            Accept: "application/JSON",
+            Authorization: "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
+            database_id: "'" + dbValue + "'"
+        };
+
+        //Set Get Request
+        let response = await fetch(authURL, {
+            method: "GET",
+            headers: headers
+        });
+
+        //Process response from the request and return the authorization token
+        let result = await response.json();
+        return result.auth_token;
+    } else {
+        console.log("Error occured in getAuth()")
+    }
     
-    //Setup request url and header info
-    const authURL = "http://localhost:9000/api/auth/APILogin";
-    const headers = {
-        Accept: "application/JSON",
-        Authorization: "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
-        database_id: "'" + dbValue + "'"
-    };
-
-    //Set Get Request
-    let response = await fetch(authURL, {
-        method: "GET",
-        headers: headers
-    });
-
-    //Process response from the request and return the authorization token
-    let result = await response.json();
-    return result.auth_token;
 };
 
 
