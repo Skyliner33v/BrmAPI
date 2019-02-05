@@ -40,15 +40,14 @@
             <nav id="updateNav">
                 <h2 id="updateNavHeader">Select a Table to Update</h2>
                 <div id="importButtons" class="stackButtons">
-                    <button id="importBridgesBtn" type="button" onclick="updateBridges()">Update Bridges</button>
-                    <button id="importInspectionsBtn" type="button" onclick="updateInspections()">Update Inspections </button>
-                    <button id="importElemDataBtn" type="button" onclick="updateElemData()">Update Element Data </button>
-                    <button id="importElemDefsBtn" type="button" onclick="updateElemDefs()">Update Element Definitions </button>
+                    <button id="importBridgesBtn" type="button" onclick="updateTable('bridges')">Update Bridges</button>
+                    <button id="importInspectionsBtn" type="button" onclick="updateTable('inspections')">Update Inspections </button>
+                    <button id="importElemDataBtn" type="button" onclick="updateTable('elementInspection')">Update Element Data </button>
+                    <button id="importElemDefsBtn" type="button" onclick="updateTable('elementDefinitions')">Update Element Definitions </button>
                 </div>
             </nav>
 
             <article id="updateArticle">
-                <h1>Response:</h1>
                 <pre id="updateResponse"></p>
             </article>
         </section>

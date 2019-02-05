@@ -39,16 +39,23 @@ async function getDB() {
 //Get list of Databases on page load to be used for the Authorization Request
 getDB();
 
+//Simple function to return database ID value
+function getDbValue() {
+    const dbOption = document.getElementById("dbDropdown");
+    const dbValue = dbOption.options[dbOption.selectedIndex].value;
+    return dbValue;
+};
 
-//Send GET request for authorization token
+
+//Request authorization token
 async function getAuth() {
-    //Get database id value
-    let dbOption = document.getElementById("dbDropdown");
-    let dbValue = dbOption.options[dbOption.selectedIndex].value;
 
+    //Get database value
+    const dbValue = getDbValue();
+    
     //Setup request url and header info
     const authURL = "http://localhost:9000/api/auth/APILogin";
-    let headers = {
+    const headers = {
         Accept: "application/JSON",
         Authorization: "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
         database_id: "'" + dbValue + "'"
@@ -62,13 +69,33 @@ async function getAuth() {
 
     //Process response from the request and return the authorization token
     let result = await response.json();
-    return result.auth_token
+    return result.auth_token;
 };
 
 
+//Build the url for any BrM Request
+function urlBuilderBRM(controllerName) {
 
-//Send GET request to 
-async function sendBrmGet() {
-    let authToken = getAuth();
-    
-}
+    //Setup Base URL for all Requests
+    const baseURL = "http://localhost:9000/rest/";
+
+    //Build the rest of the URL depending on the controller needed
+    let restURL = "";
+    switch(controllerName) {
+        case "bridges":
+            restURL = "Bridge";
+            break;
+        case "inspections":
+            restURL =  "Inspection";
+            break;
+        case "elementInspection":
+            restURL =  "ElementInspection";
+            break;
+        case "elementDefinitions":
+            restURL =  "ElementDefinitions";
+            break;
+    };
+    return baseURL + restURL;
+};
+
+
