@@ -22,8 +22,10 @@ async function getDB() {
 
     //Send request to get list of available databases and get back json data
     let response = await fetch(dbURL, {
-        method: "GET"
+        "method": "GET"
     });
+
+    //Process the Response
     let result = await response.json();
 
     // Set response data to create and populate a dropdown list on the page
@@ -43,7 +45,7 @@ getDB();
 function getDbValue() {
     const dbOption = document.getElementById("dbDropdown");
     const dbValue = dbOption.options[dbOption.selectedIndex].value;
-    if (dbValue != "bridges" || dbValue != "inspections" || dbValue != "elementInspection" || dbValue != "elementDefinitions") {
+    if (isNaN(dbValue)) {
         alert("Please select a Database first");
         return false;
     } else {
@@ -62,9 +64,9 @@ async function getAuth() {
         //Setup request url and header info
         const authURL = "http://localhost:9000/api/auth/APILogin";
         const headers = {
-            Accept: "application/JSON",
-            Authorization: "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
-            database_id: "'" + dbValue + "'"
+            "Accept": "application/JSON",
+            "Authorization": "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
+            "database_id": "'" + dbValue + "'"
         };
 
         //Set Get Request
@@ -77,9 +79,28 @@ async function getAuth() {
         let result = await response.json();
         return result.auth_token;
     } else {
-        console.log("Error occured in getAuth()")
+        console.log("Error reached in getAuth().  DB not selected")
+        return false;
     }
     
+};
+
+
+//Create headers to be used in any BrM Request
+async function headerBuilderBRM() {
+    //Get authorization token //Add this to the header instead
+    const authToken = await getAuth();
+
+    if (authToken != false) {
+        let headers = {
+            "Accept": "application/JSON",
+            "auth_token": authToken
+        };
+        return headers;
+
+    } else {
+        console.log("Error reached in updateTable().  Auth token not received");
+    }
 };
 
 
@@ -109,3 +130,39 @@ function urlBuilderBRM(controllerName) {
 };
 
 
+//Update Table in BrM from data in AssetManagement depending on which button(controller) was selected.
+async function updateTable(controllerName) {
+
+    /******************AssetManagement DB Section*******************/
+
+    //Setup AssetManagement GET request URL
+    const amURL = "http://localhost:8081/api/" + controllerName;
+
+    //Send GET Request
+    let amResponse = await fetch(amURL, {
+        method: "GET",
+    });
+
+    //Process response and use below in POST request
+    let amResult = await amResponse.json();
+    console.log("About to insert " + amResult.length + " new records into the BrM Bridges Table.  Proceed?");
+    
+
+    /******************AssetManagement DB Section*******************/
+
+    //Get URL for BrM Requests
+    const brmURL = urlBuilderBRM(controllerName);
+
+    //Get Headers for BrM Requests
+    const headers = await headerBuilderBRM();
+
+    /* Change this section to a POST instead of a GET      
+            //Send GET Request
+            let brmResponse = await fetch(brmURL, {
+                "method": "GET",
+                "headers": headers
+            });
+
+            //Process response
+            let brmResult = await brmResponse.json();            */
+};
