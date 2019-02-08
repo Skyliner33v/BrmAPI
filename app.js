@@ -9,32 +9,40 @@ Will also send a POST request to a separate table on AssetManagement to record t
 //Fetch list of available databases and populate the dropdown
 async function getDB() {
 
-    //Setup dropdown stuff
-    let dropdown = document.getElementById("dbDropdown");
-    dropdown.length = 0;
-    let defaultOption = document.createElement("option");
-    defaultOption.text = "Select a Database";
-    dropdown.add(defaultOption);
-    dropdown.selectedIndex = 0;
+    //Begin Try block
+    try {
+        //Setup dropdown stuff
+        let dropdown = document.getElementById("dbDropdown");
+        dropdown.length = 0;
+        let defaultOption = document.createElement("option");
+        defaultOption.text = "Select a Database";
+        defaultOption.value = "default";
+        dropdown.add(defaultOption);
+        dropdown.selectedIndex = 0;
 
-    //Setup Request URL
-    const dbURL = "http://localhost:9000/api/auth/GetDatabases";
+        //Setup Request URL
+        const dbURL = "http://localhost:9000/api/auth/GetDatabases";
 
-    //Send request to get list of available databases and get back json data
-    let response = await fetch(dbURL, {
-        "method": "GET"
-    });
+        //Send request to get list of available databases and get back json data
+        let response = await fetch(dbURL, {
+            "method": "GET"
+        });
 
-    //Process the Response
-    let result = await response.json();
+        //Process the Response
+        let result = await response.json();
 
-    // Set response data to create and populate a dropdown list on the page
-    let option;
-    for (let i = 0; i < result.length; i++) {
-        option = document.createElement("option")
-        option.text = "db ID: " + result[i].ID + " " + result[i].Name
-        option.value = result[i].ID
-        dropdown.add(option)
+        // Set response data to create and populate a dropdown list on the page
+        let option;
+        for (let i = 0; i < result.length; i++) {
+            option = document.createElement("option")
+            option.text = "db ID: " + result[i].ID + " " + result[i].Name
+            option.value = result[i].ID
+            dropdown.add(option)
+        };
+    }
+    //Alert if error is encountered
+    catch(error) {
+        alert("Error connecting to the BrM Database.  Try refreshing the page.");
     };
 };
 
@@ -45,12 +53,7 @@ getDB();
 function getDbValue() {
     const dbOption = document.getElementById("dbDropdown");
     const dbValue = dbOption.options[dbOption.selectedIndex].value;
-    if (isNaN(dbValue)) {
-        alert("Please select a Database first");
-        return false;
-    } else {
-        return dbValue;
-    }
+    return dbValue;
 };
 
 
@@ -60,7 +63,9 @@ async function getAuth() {
     //Get database value
     const dbValue = getDbValue();
 
-    if (dbValue != false) {    
+    //Check if a database is selected first.  If not, return a false value
+    if (dbValue != "default") {
+
         //Setup request url and header info
         const authURL = "http://localhost:9000/api/auth/APILogin";
         const headers = {
@@ -79,8 +84,7 @@ async function getAuth() {
         let result = await response.json();
         return result.auth_token;
     } else {
-        console.log("Error reached in getAuth().  DB not selected")
-        return false;
+        return false;  
     }
     
 };
@@ -99,7 +103,7 @@ async function headerBuilderBRM() {
         return headers;
 
     } else {
-        console.log("Error reached in updateTable().  Auth token not received");
+        return false;
     }
 };
 
@@ -130,25 +134,26 @@ function urlBuilderBRM(controllerName) {
 };
 
 
-//Update Table in BrM from data in AssetManagement depending on which button(controller) was selected.
-async function updateTable(controllerName) {
 
-    /******************AssetManagement DB Section*******************/
+//Send GET request to Asset Management API and return results
+async function amGetRequest(controllerName) {
 
     //Setup AssetManagement GET request URL
     const amURL = "http://localhost:8081/api/" + controllerName;
 
     //Send GET Request
-    let amResponse = await fetch(amURL, {
+    const amResponse = await fetch(amURL, {
         method: "GET",
     });
 
-    //Process response and use below in POST request
-    let amResult = await amResponse.json();
-    console.log("About to insert " + amResult.length + " new records into the BrM Bridges Table.  Proceed?");
-    
+    //Return the response
+    return await amResponse.json();
+};
 
-    /******************AssetManagement DB Section*******************/
+
+
+//Send GET request to BrM API and return results
+async function brmGetRequest(controllerName) {
 
     //Get URL for BrM Requests
     const brmURL = urlBuilderBRM(controllerName);
@@ -156,13 +161,77 @@ async function updateTable(controllerName) {
     //Get Headers for BrM Requests
     const headers = await headerBuilderBRM();
 
-    /* Change this section to a POST instead of a GET      
+    //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
+    if (headers != false) {
+        try {
             //Send GET Request
             let brmResponse = await fetch(brmURL, {
                 "method": "GET",
-                "headers": headers
+                "headers": headers,
             });
 
             //Process response
-            let brmResult = await brmResponse.json();            */
+            return await brmResponse.json();
+        }
+        catch(error) {
+            console.log("Error sending GET request to " + controllerName);
+        };
+
+    } else {
+        alert("Please select a database first")
+    };
+};
+
+
+
+//Update Table in BrM from data in AssetManagement depending on which button(controller) was selected.
+async function updateTable(controllerName) {
+
+        /*TODO
+    Check with Paul first to see how he plans on populating the Asset Management table.  Will it only be new
+    records that will wipe out the existing records first.  Or will it just dump new ones in alongside the 
+    existing ones
+    
+    If only new ones are in then it will be easy to just grab them and send the POST request.  
+    If new ones get added in to the ones already in there, a comparison will need to be made to only take 
+    the new rows.  */
+    
+
+    //First send GET requests to both databases to get the number of new records to be inserted
+    //Get new data from Assetmanagement Tables API
+    const amResult = await amGetRequest(controllerName);
+
+    //Get 
+    const brmResult = await brmGetRequest(controllerName);
+
+    console.log()
+
+
+
+
+
+
+    /******************BrM DB Section*******************/
+    //Check if the headers returned back a valid object
+    /* if (headers != false) {
+        try {
+            //Send POST Request
+            let brmResponse = await fetch(brmURL, {
+                //"method": "POST",
+                "headers": headers,
+                "body": JSON.stringify(amResult)
+            });
+
+            //Process response
+            var brmResult = await brmResponse.json();
+            console.log(brmResult);
+            alert("Successfully POSTED " + amResult.length + " records to the " + controllerName + " table.");
+        }
+        catch(error) {
+            console.log("Error sending POST request to " + controllerName);
+            }
+
+    } else {
+        alert("Please select a database first")
+    } */
 };
