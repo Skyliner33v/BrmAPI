@@ -133,6 +133,37 @@ function urlBuilderBRM(controllerName) {
     return baseURL + restURL;
 };
 
+//Send PSOT request to BrM API and return results
+async function brmGetRequest(controllerName, body) {
+
+    //Get URL for BrM Requests
+    const brmURL = urlBuilderBRM(controllerName);
+
+    //Get Headers for BrM Requests
+    const headers = await headerBuilderBRM();
+
+    //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
+    if (headers != false) {
+        try {
+            //Send GET Request
+            let brmResponse = await fetch(brmURL, {
+                "method": "POST",
+                "headers": headers,
+                "body": body
+            });
+
+            //Process response
+            return await brmResponse.json();
+        }
+        catch(error) {
+            console.log("Error sending GET request to " + controllerName);
+        };
+
+    } else {
+        alert("Please select a database first")
+    };
+};
+
 
 
 //Send GET request to Asset Management API and return results
@@ -152,6 +183,30 @@ async function amGetRequest(controllerName) {
 
 
 
+//Update Table in BrM from data in AssetManagement depending on which button(controller) was selected.
+async function updateTable(controllerName) {
+
+    /**Only new data will be sitting in the AssetManagement tables.  The ETL will truncate the table before populating it 
+    * with new data from the BPO databases
+    */
+
+    //Get new data from Assetmanagement Tables API
+    const amResult = await amGetRequest(controllerName);
+
+    //Send POST request to the BrM tables
+    const brmResult = await brmGetRequest(controllerName, amResult);
+
+    console.log(brmResult);
+
+
+
+
+
+};
+
+
+
+//Hold for future use
 //Send GET request to BrM API and return results
 async function brmGetRequest(controllerName) {
 
@@ -180,58 +235,4 @@ async function brmGetRequest(controllerName) {
     } else {
         alert("Please select a database first")
     };
-};
-
-
-
-//Update Table in BrM from data in AssetManagement depending on which button(controller) was selected.
-async function updateTable(controllerName) {
-
-        /*TODO
-    Check with Paul first to see how he plans on populating the Asset Management table.  Will it only be new
-    records that will wipe out the existing records first.  Or will it just dump new ones in alongside the 
-    existing ones
-    
-    If only new ones are in then it will be easy to just grab them and send the POST request.  
-    If new ones get added in to the ones already in there, a comparison will need to be made to only take 
-    the new rows.  */
-    
-
-    //First send GET requests to both databases to get the number of new records to be inserted
-    //Get new data from Assetmanagement Tables API
-    const amResult = await amGetRequest(controllerName);
-
-    //Get 
-    const brmResult = await brmGetRequest(controllerName);
-
-    console.log()
-
-
-
-
-
-
-    /******************BrM DB Section*******************/
-    //Check if the headers returned back a valid object
-    /* if (headers != false) {
-        try {
-            //Send POST Request
-            let brmResponse = await fetch(brmURL, {
-                //"method": "POST",
-                "headers": headers,
-                "body": JSON.stringify(amResult)
-            });
-
-            //Process response
-            var brmResult = await brmResponse.json();
-            console.log(brmResult);
-            alert("Successfully POSTED " + amResult.length + " records to the " + controllerName + " table.");
-        }
-        catch(error) {
-            console.log("Error sending POST request to " + controllerName);
-            }
-
-    } else {
-        alert("Please select a database first")
-    } */
 };
