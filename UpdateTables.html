@@ -23,7 +23,7 @@
 
     <div id="dbSelectDiv" class="cards">
         <header id="dbSelectHeader">
-            <h2>Select a Database</h2>
+            <h2>Select a BrM Database to insert Data</h2>
         </header>
         <div id="dbDropdownDiv">
             <select id="dbDropdown" name="dbSelect"></select>
@@ -41,9 +41,9 @@
                 <h2 id="updateNavHeader">Select a Table to Update</h2>
                 <div id="importButtons" class="stackButtons">  <!--onclick will pass in controller name-->
                     <button id="importBridgesBtn" type="button" onclick="updateTable('bridges')">Update Bridges</button>
+                    <button id="importElemDefsBtn" type="button" onclick="updateTable('roadway')">Update Roadway </button>
                     <button id="importInspectionsBtn" type="button" onclick="updateTable('inspections')">Update Inspections </button>
                     <button id="importElemDataBtn" type="button" onclick="updateTable('elementInspection')">Update Element Data </button>
-                    <button id="importElemDefsBtn" type="button" onclick="updateTable('elementDefinitions')">Update Element Definitions </button>
                 </div>
             </nav>
 
