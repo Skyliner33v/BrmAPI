@@ -98,6 +98,7 @@ async function headerBuilderBRM() {
     if (authToken != false) {
         let headers = {
             "Accept": "application/JSON",
+            "content-type": "application/JSON",
             "auth_token": authToken
         };
         return headers;
@@ -133,8 +134,8 @@ function urlBuilderBRM(controllerName) {
     return baseURL + restURL;
 };
 
-//Send PSOT request to BrM API and return results
-async function brmGetRequest(controllerName, body) {
+//Send POST request to BrM API and return results
+async function brmPostRequest(controllerName, body) {
 
     //Get URL for BrM Requests
     const brmURL = urlBuilderBRM(controllerName);
@@ -149,10 +150,10 @@ async function brmGetRequest(controllerName, body) {
             let brmResponse = await fetch(brmURL, {
                 "method": "POST",
                 "headers": headers,
-                "body": body
+                "data": JSON.stringify(body)
             });
 
-            //Process response
+            //Return the response
             return await brmResponse.json();
         }
         catch(error) {
@@ -165,7 +166,7 @@ async function brmGetRequest(controllerName, body) {
 };
 
 
-
+/******** AssetManagment GET Request ***********/
 //Send GET request to Asset Management API and return results
 async function amGetRequest(controllerName) {
 
@@ -183,32 +184,55 @@ async function amGetRequest(controllerName) {
 
 
 
+/******** Update BrM Tables with AssetManagement Data ***********/
 //Update Table in BrM from data in AssetManagement depending on which button(controller) was selected.
 async function updateTable(controllerName) {
 
-    /**Only new data will be sitting in the AssetManagement tables.  The ETL will truncate the table before populating it 
-    * with new data from the BPO databases
-    */
+    try {
+        //Run different checks depending on which controller is selected before inserting data
+        switch(controllerName) {
+            case "bridges":
+                //If updating bridges, run through the bridges check first
+                updateBrmBridges(controllerName);
+                break;
 
-    //Get new data from Assetmanagement Tables API
-    const amResult = await amGetRequest(controllerName);
+            case "roadway":
+                //If updating Roadway, run through the roadway checks first
+                updateBrmRoadways(controllerName);
+                break;
 
-    //Send POST request to the BrM tables
-    const brmResult = await brmGetRequest(controllerName, amResult);
+            case "inspections":
+            case "elementDefinitions":
+                //If updating Inspections or Element Data, ok to just send the POST request immediately
+                const amResult = await amGetRequest(controllerName);
+                const brmResult = await brmPostRequest(controllerName, amResult);
+                console.log("brmResult = ", brmResult);
+                break;
+        };
 
-    console.log(brmResult);
 
-
-
-
-
+    }
+    catch(error) {
+        console.log(error);
+    }
 };
+
+
+
+//Get new data from Assetmanagement Tables API
+//const amResult = await amGetRequest(controllerName);
+//console.log(amResult[0].obsolete_date)
+
+//Send POST request to the BrM tables
+//const brmResult = await brmPostRequest(controllerName, amResult);
+//console.log("brmResult = ", brmResult);
+
 
 
 
 //Hold for future use
 //Send GET request to BrM API and return results
-async function brmGetRequest(controllerName) {
+/* async function brmGetRequest(controllerName) {
 
     //Get URL for BrM Requests
     const brmURL = urlBuilderBRM(controllerName);
@@ -235,4 +259,4 @@ async function brmGetRequest(controllerName) {
     } else {
         alert("Please select a database first")
     };
-};
+}; */
