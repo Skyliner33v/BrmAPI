@@ -320,11 +320,13 @@ async function updateBrmBridges(controllerName) {
         //Send POST request for new Bridges to be added to the database
         if (Object.keys(separatedValues.postBridges).length >= 1) {
             //const postedBridges = brmPostRequest(controllerName, returnedValues.postBridges);
+            console.log (JSON.stringify(separatedValues));
         }
 
         //Send PUT request for new Bridges to be added to the database
         if (Object.keys(separatedValues.putBridges).length >= 1) {
             //const puttedBridges = brmPutRequest(controllerName, returnedValues.putBridges);
+            console.log (JSON.stringify(separatedValues));
         };
 
     }
