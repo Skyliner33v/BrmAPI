@@ -6,6 +6,24 @@ Will then pass that data to a function for either a POST or PUT request and send
 Will also send a POST request to a separate table on AssetManagement to record transaction data*/
 
 
+/******** Generic AssetManagment GET Request ***********/
+//Send GET request to Asset Management API and return results
+async function amGetRequest(controllerName) {
+
+    //Setup AssetManagement GET request URL
+    const amURL = "http://localhost:8081/api/" + controllerName;
+
+    //Send GET Request
+    const amResponse = await fetch(amURL, {
+        method: "GET",
+    });
+
+    //Return the response
+    return await amResponse.json();
+};
+
+
+
 //Fetch list of available databases and populate the dropdown
 async function getDB() {
 
@@ -168,6 +186,11 @@ async function brmGetRequest(controllerName) {
 }; 
 
 
+/*********************TODO************************/
+//This needs work to get the body portion fixed.  Currently does not recognize the object.
+//Need to possibly remove the keys [0,1,2,3,4 etc] first.  IE remove the top level keys.  
+//Or issue might be that the BrM API cannot accept more than one key as a POST request but this seems unlikely. 
+//Error is more likely on my end in correctly forming up the body of the request. 
 
 /******** Generic BrM POST Request ***********/
 //Send POST request to BrM API and return results
@@ -203,6 +226,12 @@ async function brmPostRequest(controllerName, body) {
 
 
 
+/*********************TODO************************/
+//This needs work to get the body portion fixed.  Currently does not recognize the object.
+//Need to possibly remove the keys [0,1,2,3,4 etc] first.  IE remove the top level keys.  
+//Or issue might be that the BrM API cannot accept more than one key as a PUT request but this seems unlikely. 
+//Error is more likely on my end in correctly forming up the body of the request. 
+
 /******** Generic BrM PUT Request ***********/
 //Send PUT request to BrM API and return results
 async function brmPutRequest(controllerName, body) {
@@ -237,64 +266,71 @@ async function brmPutRequest(controllerName, body) {
 
 
 
-/******** Generic AssetManagment GET Request ***********/
-//Send GET request to Asset Management API and return results
-async function amGetRequest(controllerName) {
+//Compare data in Brm and AssetManagement Tables
+//If it exists, it will remove it from the list, and push it to a new list of only bridges that match whats already in BrM
+//The resultant new list will be passed off as the body of a PUT request to update existing data.  
+//The original list will now only contain new bridges that will be used as the body of a POST request. 
+function compareBridgeData(brmData, amData) {
+    let putBridges = [];
+    let postBridges = [];
 
-    //Setup AssetManagement GET request URL
-    const amURL = "http://localhost:8081/api/" + controllerName;
+    for (let i = 0; i < amData.length; i++) {
+        for (let j = 0; j < brmData.length; j++) {
+            if (amData[i].BRIDGE_GD == brmData[j].BRIDGE_GD) {
+                putBridges.push(amData[i]);
+                delete amData[i];
+                break;
+            };
+        };
+    };
 
-    //Send GET Request
-    const amResponse = await fetch(amURL, {
-        method: "GET",
-    });
+    //After moving the matching bridges to a new list, assign the remaining bridges in the new data to a new variable for clarity
+    postBridges = amData;
 
-    //Return the response
-    return await amResponse.json();
+    //Send off list of PUT bridges to check if any structures are obsolete and 
+    /*********TODO**********/
+
+
+    //Return the separated data as an object
+    return {postBridges, putBridges};
+
+    /*This function works almost the same as above, but written in the newer syntax. I just don't understand it very well.*/
+    // let matchingBridgeResults = amData.filter(({BRIDGE_GD}) =>
+    //     brmData.some(brm => brm.BRIDGE_GD)
+    // );
 };
 
 
 
 
-/******** Inpsect and Separate the new data before updating the BRIDGE Table in BrM ***********/
+/******** Inpsect and separate the new data before updating the ---BRIDGE--- Table in BrM ***********/
 //This function will inspect the new data and compare it to the data already in BrM to determine if the new data should be a POST or PUT request
 async function updateBrmBridges(controllerName) {
     try {
         //First Send a GET Request to the BrM API to fetch the existing data
         const brmResult = await brmGetRequest(controllerName);
-    
+
         //Then send a GET Request to the AssetManagement API to fetch the new data to compare against the existing
         const amResult = await amGetRequest(controllerName);
 
-        //Next build a list of matching bridges by looping through each AssetManagement BRIDGE_GD and see if it already exists in BrM.
-        //If it exists, it will remove it from the list, and push it to a new list of only bridges that match whats already in BrM
-        //The resultant new list will be passed off as the body of a PUT request to update existing data.  
-        //The original list will now only contain new bridges that will be used as the body of a POST request. 
-        let matchingBridgesResult = [];
+        //Next send off the above results and build a list of matching bridges by looping through each AssetManagement BRIDGE_GD and see if it already exists in BrM.
+        //Returns 2 lists of separated bridges.  One for POST requests.  Other for PUT requests.  
+        const separatedValues =  compareBridgeData(brmResult, amResult);
 
-        for (var i = 0; i < amResult.length; i++) {
-            for (var j = 0; j < brmResult.length; j++) {
-                if (amResult[i].BRIDGE_GD == brmResult[j].BRIDGE_GD) {
-                    matchingBridgesResult.push(amResult[i]);
-                    delete amResult[i];
-                    break;
-                };
-            };
+        //Send POST request for new Bridges to be added to the database
+        if (Object.keys(separatedValues.postBridges).length >= 1) {
+            //const postedBridges = brmPostRequest(controllerName, returnedValues.postBridges);
+        }
+
+        //Send PUT request for new Bridges to be added to the database
+        if (Object.keys(separatedValues.putBridges).length >= 1) {
+            //const puttedBridges = brmPutRequest(controllerName, returnedValues.putBridges);
         };
-
-        /*This function works exactly the same as above, but written in the newer syntax.*/
-        /*I just don't understand it very well.*/
-            // let matchingBridgesResult = amResult.filter(({BRIDGE_GD}) =>
-            //     brmResult.some(brm => brm.BRIDGE_GD)
-            // );
-        
-        
-
 
     }
     catch(error){
         console.log(error);
-    }
+    };
 };
 
 
@@ -306,22 +342,26 @@ async function updateTable(controllerName) {
     try {
         //Run different checks depending on which controller is selected before inserting data
         switch(controllerName) {
+
+            //If updating bridges, run through the bridges check first
             case "bridges":
-                //If updating bridges, run through the bridges check first
                 updateBrmBridges(controllerName);                
                 break;
 
+            //If updating Roadway, run through the roadway checks first
             case "roadway":
-                //If updating Roadway, run through the roadway checks first
                 updateBrmRoadways(controllerName);
                 break;
 
+            //If updating Inspections or Element Data, ok to just send the POST request immediately
             case "inspections":
             case "elementData":
-                //If updating Inspections or Element Data, ok to just send the POST request immediately
-                //const amResult = await amGetRequest(controllerName);
-                //const brmResult = await brmPostRequest(controllerName, amResult);
-                //console.log("brmResult = ", brmResult);
+
+                /*Uncomment when above TODOs is fixed
+                const amResult = await amGetRequest(controllerName);
+                const brmResult = await brmPostRequest(controllerName, amResult);
+                console.log("brmResult = ", brmResult);
+                */
                 
                 break;
         };
