@@ -266,14 +266,42 @@ async function brmPutRequest(controllerName, body) {
 
 
 
-//Compare data in Brm and AssetManagement Tables
-//If it exists, it will remove it from the list, and push it to a new list of only bridges that match whats already in BrM
-//The resultant new list will be passed off as the body of a PUT request to update existing data.  
-//The original list will now only contain new bridges that will be used as the body of a POST request. 
-function compareBridgeData(brmData, amData) {
-    let putBridges = [];
-    let postBridges = [];
+//Analyze list of PUT bridges.  Set the "Obsolete" flag if the structure is obsolete, otherwise leave alone.  Also strips out obsolete date after analyzing.  
+//This can easily be extended to include other flags in the future.
+// 0 = Unknown
+// 1 = Inactive
+// 2 = Closed
+// 3 = Active
+// 4 = Proposed
+// 5 = Obsolete
+function flagInactiveBridges(putBridges) {
 
+    //Loop through each bridge and check the obsolete_date value
+    for (let i = 0; i < putBridges.length; i++) {
+
+        //If the obsolete_date value is anything else but null or undefined, then mark the bridge as "Inactive"
+        
+        let obsDate = putBridges[i].obsolete_date;
+        if(!(obsDate == null || obsDate == undefined)) {
+            putBridges[i].BRIDGE_STATUS = 5;
+        };
+
+        //After checking and making changes to bridge_status, delete the obsolete_date value from the list as it is not needed anymore and wouldn't be accepted in the PUT request. 
+        delete putBridges[i].obsolete_date;
+    };
+
+    //Return the list of PUT bridges after analyzing
+    return putBridges;
+};
+
+
+
+//Compare data in Brm and AssetManagement Tables
+function compareBridgeData(brmData, amData) {
+
+    //Check if a bridge already exists in brmData, if it does, remove it from the list and push it to a new putBridges list.  
+    //The original list, amData, will have the PUT Bridges stripped out, leaving only a list of bridges to be used as the POST request.  
+    let putBridges = [];
     for (let i = 0; i < amData.length; i++) {
         for (let j = 0; j < brmData.length; j++) {
             if (amData[i].BRIDGE_GD == brmData[j].BRIDGE_GD) {
@@ -282,22 +310,19 @@ function compareBridgeData(brmData, amData) {
                 break;
             };
         };
+        //After checking for and moving duplicates, strip out the obsolete date as it is an extra field and won't be accepted in any PUT or POST request. 
+        delete amData.obsolete_date;
     };
 
-    //After moving the matching bridges to a new list, assign the remaining bridges in the new data to a new variable for clarity
-    postBridges = amData;
+    //Send the putBridges list off to check for valid obsolete_dates and return the modified list
+    flagInactiveBridges(putBridges);
 
-    //Send off list of PUT bridges to check if any structures are obsolete and 
-    /*********TODO**********/
-
+    //Set original amData list of bridges to a new name for clarity
+    let postBridges = amData;
 
     //Return the separated data as an object
     return {postBridges, putBridges};
 
-    /*This function works almost the same as above, but written in the newer syntax. I just don't understand it very well.*/
-    // let matchingBridgeResults = amData.filter(({BRIDGE_GD}) =>
-    //     brmData.some(brm => brm.BRIDGE_GD)
-    // );
 };
 
 
@@ -319,14 +344,14 @@ async function updateBrmBridges(controllerName) {
 
         //Send POST request for new Bridges to be added to the database
         if (Object.keys(separatedValues.postBridges).length >= 1) {
-            //const postedBridges = brmPostRequest(controllerName, returnedValues.postBridges);
-            console.log (JSON.stringify(separatedValues));
+            //const postedBridges = await brmPostRequest(controllerName, separatedValues.postBridges);
+            console.log("postBridges ", JSON.stringify(separatedValues.postBridges));
         }
 
         //Send PUT request for new Bridges to be added to the database
         if (Object.keys(separatedValues.putBridges).length >= 1) {
-            //const puttedBridges = brmPutRequest(controllerName, returnedValues.putBridges);
-            console.log (JSON.stringify(separatedValues));
+            //const puttedBridges = await brmPutRequest(controllerName, separatedValues.putBridges);
+            console.log("putBridges ", JSON.stringify(separatedValues.putBridges));
         };
 
     }
