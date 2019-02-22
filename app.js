@@ -287,9 +287,6 @@ function flagInactiveBridges(putBridges) {
         if(!(obsDate == null || obsDate == undefined)) {
             putBridges[i].BRIDGE_STATUS = 5;
         };
-
-        //After checking and making changes to bridge_status, delete the obsolete_date value from the list as it is not needed anymore and wouldn't be accepted in the PUT request. 
-        delete putBridges[i].obsolete_date;
     };
 
     //Return the list of PUT bridges after analyzing
@@ -312,8 +309,6 @@ function compareBridgeData(brmData, amData) {
                 break;
             };
         };
-        //After checking for and moving duplicates, strip out the obsolete date as it is an extra field and won't be accepted in any PUT or POST request. 
-        delete amData.obsolete_date;
     };
 
     //Send the putBridges list off to check for valid obsolete_dates and return the modified list
