@@ -241,6 +241,8 @@ async function brmPutRequest(controllerName, body) {
 
     //Get Headers for BrM Requests
     const headers = await headerBuilderBRM();
+    console.log(JSON.stringify(body));
+    console.log(brmURL + "/" + body[0].BRIDGE_GD);
 
     //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
     if (headers != false) {
@@ -249,7 +251,7 @@ async function brmPutRequest(controllerName, body) {
             let brmResponse = await fetch(brmURL, {
                 "method": "PUT",
                 "headers": headers,
-                "data": JSON.stringify(body)
+                "data": body
             });
 
             //Return the response
@@ -344,14 +346,12 @@ async function updateBrmBridges(controllerName) {
 
         //Send POST request for new Bridges to be added to the database
         if (Object.keys(separatedValues.postBridges).length >= 1) {
-            //const postedBridges = await brmPostRequest(controllerName, separatedValues.postBridges);
-            console.log("postBridges ", JSON.stringify(separatedValues.postBridges));
+            const postedBridges = await brmPostRequest(controllerName, separatedValues.postBridges);
         }
 
         //Send PUT request for new Bridges to be added to the database
         if (Object.keys(separatedValues.putBridges).length >= 1) {
-            //const puttedBridges = await brmPutRequest(controllerName, separatedValues.putBridges);
-            console.log("putBridges ", JSON.stringify(separatedValues.putBridges));
+            const puttedBridges = await brmPutRequest(controllerName, separatedValues.putBridges);
         };
 
     }
@@ -364,36 +364,29 @@ async function updateBrmBridges(controllerName) {
 
 
 /******** Update BrM Tables with AssetManagement Data ***********/
-//Update Table in BrM from data in AssetManagement depending on which button(controller) was selected.
+//Update Table in BrM from data in AssetManagement depending on which button(controller) was clicked.
 async function updateTable(controllerName) {
     try {
         //Run different checks depending on which controller is selected before inserting data
         switch(controllerName) {
 
-            //If updating bridges, run through the bridges check first
+            //If updating bridges or roadway, run through checks first
             case "bridges":
-                updateBrmBridges(controllerName);                
-                break;
-
-            //If updating Roadway, run through the roadway checks first
             case "roadway":
-                updateBrmRoadways(controllerName);
+                updateBrgRdwy(controllerName);                
                 break;
 
             //If updating Inspections or Element Data, ok to just send the POST request immediately
             case "inspections":
             case "elementData":
 
-                /*Uncomment when above TODOs is fixed
                 const amResult = await amGetRequest(controllerName);
                 const brmResult = await brmPostRequest(controllerName, amResult);
-                console.log("brmResult = ", brmResult);
-                */
-                
                 break;
         };
 
         //Update AssetManagement Tables with data relating to how many records were Inserted or Updated into BrM
+
 
     }
     catch(error) {
@@ -403,13 +396,6 @@ async function updateTable(controllerName) {
 
 
 
-//Get new data from Assetmanagement Tables API
-//const amResult = await amGetRequest(controllerName);
-//console.log(amResult[0].obsolete_date)
-
-//Send POST request to the BrM tables
-//const brmResult = await brmPostRequest(controllerName, amResult);
-//console.log("brmResult = ", brmResult);
 
 
 
