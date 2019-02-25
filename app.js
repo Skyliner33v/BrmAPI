@@ -276,58 +276,82 @@ async function brmPutRequest(controllerName, body) {
 // 3 = Active
 // 4 = Proposed
 // 5 = Obsolete
-function flagInactiveBridges(putBridges) {
+function flagInactiveBridges(putData) {
 
     //Loop through each bridge and check the obsolete_date value
-    for (let i = 0; i < putBridges.length; i++) {
+    for (let i = 0; i < putData.length; i++) {
 
         //If the obsolete_date value is anything else but null or undefined, then mark the bridge as "Inactive"
         
-        let obsDate = putBridges[i].obsolete_date;
+        let obsDate = putData[i].obsolete_date;
         if(!(obsDate == null || obsDate == undefined)) {
-            putBridges[i].BRIDGE_STATUS = 5;
+            putData[i].BRIDGE_STATUS = 5;
         };
     };
 
     //Return the list of PUT bridges after analyzing
-    return putBridges;
+    return putData;
 };
 
 
 
 //Compare data in Brm and AssetManagement Tables
-function compareBridgeData(brmData, amData) {
+function compareData(controllerName, brmData, amData) {
 
-    //Check if a bridge already exists in brmData, if it does, remove it from the list and push it to a new putBridges list.  
-    //The original list, amData, will have the PUT Bridges stripped out, leaving only a list of bridges to be used as the POST request.  
-    let putBridges = [];
-    for (let i = 0; i < amData.length; i++) {
-        for (let j = 0; j < brmData.length; j++) {
-            if (amData[i].BRIDGE_GD == brmData[j].BRIDGE_GD) {
-                putBridges.push(amData[i]);
-                delete amData[i];
-                break;
+    //Initialize an empty list to house the PUT data
+    let putData = [];
+
+    if(controllerName == "bridges") {
+        //Check if a bridge already exists in brmData, if it does, remove it from the list and push it to the putData list.  
+        //The original list, amData, will have the PUT Bridges stripped out, leaving only a list of bridges to be used as the POST request.  
+        for (let i = 0; i < amData.length; i++) {
+            for (let j = 0; j < brmData.length; j++) {
+                if (amData[i].BRIDGE_GD == brmData[j].BRIDGE_GD) {
+                    putData.push(amData[i]);
+                    delete amData[i];
+                    break;
+                };
             };
         };
+    }
+
+    //Check if a roadway already exists in brmData, if it does, remove it from the list and push it to the putData list.  
+    //The original list, amData, will have the PUT Roadways stripped out, leaving only a list of Roadways to be used as the POST request.
+    else if (controllerName == "roadway") {
+        for (let i = 0; i < amData.length; i++) {
+            for (let j = 0; j < brmData.length; j++) {
+                if (amData[i].ROADWAY_GD == brmData[j].ROADWAY_GD) {
+                    putData.push(amData[i]);
+                    delete amData[i];
+                    break;
+                };
+            };
+        };
+    }
+    
+    else {
+        alert("Error comparing BrM and AssetManagement Data");
     };
 
-    //Send the putBridges list off to check for valid obsolete_dates and return the modified list
-    flagInactiveBridges(putBridges);
+    //If is "BRIDGES" data, then send the PUT list off to check for valid obsolete_dates and return the modified list
+    if (controllerName == "bridges"){
+        flagInactiveBridges(putData);
+    };
 
-    //Set original amData list of bridges to a new name for clarity
-    let postBridges = amData;
+    //Set original amData list of bridges to a new name for clarity in the return data
+    let postData = amData;
 
     //Return the separated data as an object
-    return {postBridges, putBridges};
+    return {postData, putData};
 
 };
 
 
 
 
-/******** Inpsect and separate the new data before updating the ---BRIDGE--- Table in BrM ***********/
+/******** Inpsect and separate the new data before updating the BRIDGE or ROADWAY tables in BrM ***********/
 //This function will inspect the new data and compare it to the data already in BrM to determine if the new data should be a POST or PUT request
-async function updateBrmBridges(controllerName) {
+async function updateBrgRdwy(controllerName) {
     try {
         //First Send a GET Request to the BrM API to fetch the existing data
         const brmResult = await brmGetRequest(controllerName);
@@ -336,17 +360,17 @@ async function updateBrmBridges(controllerName) {
         const amResult = await amGetRequest(controllerName);
 
         //Next send off the above results and build a list of matching bridges by looping through each AssetManagement BRIDGE_GD and see if it already exists in BrM.
-        //Returns 2 lists of separated bridges.  One for POST requests.  Other for PUT requests.  
-        const separatedValues =  compareBridgeData(brmResult, amResult);
+        //Returns 2 lists of separated data.  One for POST requests.  Other for PUT requests.  
+        const separatedValues =  compareData(controllerName, brmResult, amResult);
 
-        //Send POST request for new Bridges to be added to the database
-        if (Object.keys(separatedValues.postBridges).length >= 1) {
-            const postedBridges = await brmPostRequest(controllerName, separatedValues.postBridges);
+        //Send POST request for new Data to be added to the database
+        if (Object.keys(separatedValues.postData).length >= 1) {
+            const postedData = await brmPostRequest(controllerName, separatedValues.postData);
         }
 
-        //Send PUT request for new Bridges to be added to the database
-        if (Object.keys(separatedValues.putBridges).length >= 1) {
-            const puttedBridges = await brmPutRequest(controllerName, separatedValues.putBridges);
+        //Send PUT request for new Data to update the existing records in the database
+        if (Object.keys(separatedValues.putData).length >= 1) {
+            const puttedData = await brmPutRequest(controllerName, separatedValues.putData);
         };
 
     }
@@ -374,7 +398,6 @@ async function updateTable(controllerName) {
             //If updating Inspections or Element Data, ok to just send the POST request immediately
             case "inspections":
             case "elementData":
-
                 const amResult = await amGetRequest(controllerName);
                 const brmResult = await brmPostRequest(controllerName, amResult);
                 break;
