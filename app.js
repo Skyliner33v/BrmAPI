@@ -298,40 +298,19 @@ function flagInactiveBridges(putData) {
 //Compare data in Brm and AssetManagement Tables
 function compareData(controllerName, brmData, amData) {
 
-    //Initialize an empty list to house the PUT data
-    let putData = [];
-
     if(controllerName == "bridges") {
-        //Check if a bridge already exists in brmData, if it does, remove it from the list and push it to the putData list.  
-        //The original list, amData, will have the PUT Bridges stripped out, leaving only a list of bridges to be used as the POST request.  
-        for (let i = 0; i < amData.length; i++) {
-            for (let j = 0; j < brmData.length; j++) {
-                if (amData[i].BRIDGE_GD == brmData[j].BRIDGE_GD) {
-                    putData.push(amData[i]);
-                    delete amData[i];
-                    break;
-                };
-            };
-        };
+        //Create list of matching bridges to be used as a PUT request
+        var putData = amData.filter(({BRIDGE_GD}) => brmData.some(brm => brm.BRIDGE_GD));
     }
 
-    //Check if a roadway already exists in brmData, if it does, remove it from the list and push it to the putData list.  
-    //The original list, amData, will have the PUT Roadways stripped out, leaving only a list of Roadways to be used as the POST request.
     else if (controllerName == "roadway") {
-        for (let i = 0; i < amData.length; i++) {
-            for (let j = 0; j < brmData.length; j++) {
-                if (amData[i].ROADWAY_GD == brmData[j].ROADWAY_GD) {
-                    putData.push(amData[i]);
-                    delete amData[i];
-                    break;
-                };
-            };
-        };
+        //Create list of matching bridges to be used as a PUT request
+        var putData = amData.filter(({ROADWAY_GD}) => brmData.some(brm => brm.BRIDGE_GD));
     }
-    
+
     else {
         alert("Error comparing BrM and AssetManagement Data");
-    };
+    }; 
 
     //If is "BRIDGES" data, then send the PUT list off to check for valid obsolete_dates and return the modified list
     if (controllerName == "bridges"){
@@ -365,12 +344,14 @@ async function updateBrgRdwy(controllerName) {
 
         //Send POST request for new Data to be added to the database
         if (Object.keys(separatedValues.postData).length >= 1) {
-            const postedData = await brmPostRequest(controllerName, separatedValues.postData);
+            //const postedData = await brmPostRequest(controllerName, separatedValues.postData);
+            console.log("postData: ", separatedValues.postData);
         }
 
         //Send PUT request for new Data to update the existing records in the database
         if (Object.keys(separatedValues.putData).length >= 1) {
-            const puttedData = await brmPutRequest(controllerName, separatedValues.putData);
+            //const puttedData = await brmPutRequest(controllerName, separatedValues.putData);
+            console.log("putData: ", separatedValues.putData);
         };
 
     }
