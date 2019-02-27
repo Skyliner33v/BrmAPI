@@ -314,7 +314,7 @@ function compareData(controllerName, brmData, amData) {
 
         //Create list of non-matching roadways to be used as a POST request
         var putData = amData.filter(({ROADWAY_GD}) => 
-            brmData.some(brm => brm.BRIDGE_GD != ROADWAY_GD));
+            brmData.every(brm => brm.BRIDGE_GD != ROADWAY_GD));
     }
     else {
         alert("Error comparing BrM and AssetManagement Data");
