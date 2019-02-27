@@ -282,7 +282,6 @@ function flagInactiveBridges(putData) {
     for (let i = 0; i < putData.length; i++) {
 
         //If the obsolete_date value is anything else but null or undefined, then mark the bridge as "Inactive"
-        
         let obsDate = putData[i].obsolete_date;
         if(!(obsDate == null || obsDate == undefined)) {
             putData[i].BRIDGE_STATUS = 5;
@@ -298,16 +297,25 @@ function flagInactiveBridges(putData) {
 //Compare data in Brm and AssetManagement Tables
 function compareData(controllerName, brmData, amData) {
 
+    //Evaluate which controller first
     if(controllerName == "bridges") {
         //Create list of matching bridges to be used as a PUT request
-        var putData = amData.filter(({BRIDGE_GD}) => brmData.some(brm => brm.BRIDGE_GD));
-    }
+        var putData = amData.filter(({BRIDGE_GD}) => 
+            brmData.some(brm => brm.BRIDGE_GD == BRIDGE_GD));
 
+            //Create list of non-matching bridges to be used as a POST request
+        var postData = amData.filter(({BRIDGE_GD}) => 
+            brmData.every(brm => brm.BRIDGE_GD != BRIDGE_GD));
+    } 
     else if (controllerName == "roadway") {
-        //Create list of matching bridges to be used as a PUT request
-        var putData = amData.filter(({ROADWAY_GD}) => brmData.some(brm => brm.BRIDGE_GD));
-    }
+        //Create list of matching roadways to be used as a PUT request
+        var putData = amData.filter(({ROADWAY_GD}) => 
+            brmData.some(brm => brm.BRIDGE_GD == ROADWAY_GD));
 
+        //Create list of non-matching roadways to be used as a POST request
+        var putData = amData.filter(({ROADWAY_GD}) => 
+            brmData.some(brm => brm.BRIDGE_GD != ROADWAY_GD));
+    }
     else {
         alert("Error comparing BrM and AssetManagement Data");
     }; 
@@ -316,9 +324,6 @@ function compareData(controllerName, brmData, amData) {
     if (controllerName == "bridges"){
         flagInactiveBridges(putData);
     };
-
-    //Set original amData list of bridges to a new name for clarity in the return data
-    let postData = amData;
 
     //Return the separated data as an object
     return {postData, putData};
