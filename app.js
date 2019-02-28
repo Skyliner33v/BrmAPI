@@ -241,8 +241,6 @@ async function brmPutRequest(controllerName, body) {
 
     //Get Headers for BrM Requests
     const headers = await headerBuilderBRM();
-    console.log(JSON.stringify(body));
-    console.log(brmURL + "/" + body[0].BRIDGE_GD);
 
     //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
     if (headers != false) {
@@ -300,21 +298,21 @@ function compareData(controllerName, brmData, amData) {
     //Evaluate which controller first
     if(controllerName == "bridges") {
         //Create list of matching bridges to be used as a PUT request
-        var putData = amData.filter(({BRIDGE_GD}) => 
-            brmData.some(brm => brm.BRIDGE_GD == BRIDGE_GD));
+        var putData = amData.filter(amGuid => 
+            brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
 
-            //Create list of non-matching bridges to be used as a POST request
-        var postData = amData.filter(({BRIDGE_GD}) => 
-            brmData.every(brm => brm.BRIDGE_GD != BRIDGE_GD));
+        //Create list of non-matching bridges to be used as a POST request
+        var postData = amData.filter(amGuid => 
+            !brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
     } 
     else if (controllerName == "roadway") {
         //Create list of matching roadways to be used as a PUT request
-        var putData = amData.filter(({ROADWAY_GD}) => 
-            brmData.some(brm => brm.BRIDGE_GD == ROADWAY_GD));
+        var putData = amData.filter(amGuid => 
+            brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
 
         //Create list of non-matching roadways to be used as a POST request
-        var putData = amData.filter(({ROADWAY_GD}) => 
-            brmData.every(brm => brm.BRIDGE_GD != ROADWAY_GD));
+        var postData = amData.filter(amGuid => 
+            !brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
     }
     else {
         alert("Error comparing BrM and AssetManagement Data");
@@ -350,13 +348,13 @@ async function updateBrgRdwy(controllerName) {
         //Send POST request for new Data to be added to the database
         if (Object.keys(separatedValues.postData).length >= 1) {
             //const postedData = await brmPostRequest(controllerName, separatedValues.postData);
-            console.log("postData: ", separatedValues.postData);
+            //console.log("postData: ", separatedValues.postData);
         }
 
         //Send PUT request for new Data to update the existing records in the database
         if (Object.keys(separatedValues.putData).length >= 1) {
             //const puttedData = await brmPutRequest(controllerName, separatedValues.putData);
-            console.log("putData: ", separatedValues.putData);
+            //console.log("putData: ", separatedValues.putData);
         };
 
     }
