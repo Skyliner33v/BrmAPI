@@ -205,15 +205,15 @@ async function brmPostRequest(controllerName, body) {
     //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
     if (headers != false) {
         try {
-            //Send GET Request
-            let brmResponse = await fetch(brmURL, {
-                "method": "POST",
-                "headers": headers,
-                "data": JSON.stringify(body)
-            });
+                //Send GET Request
+                let brmResponse = await fetch(brmURL, {
+                    "method": "POST",
+                    "headers": headers,
+                    "body": JSON.stringify(body)
+                });
 
-            //Return the response
-            return await brmResponse.json();
+                //Return the response promise
+                return await brmResponse.json();
         }
         catch(error) {
             console.log("Error sending POST request to " + controllerName);
@@ -347,14 +347,21 @@ async function updateBrgRdwy(controllerName) {
 
         //Send POST request for new Data to be added to the database
         if (Object.keys(separatedValues.postData).length >= 1) {
-            //const postedData = await brmPostRequest(controllerName, separatedValues.postData);
-            //console.log("postData: ", separatedValues.postData);
+
+            let promiseArray = [];
+
+            for (let i = 0; i < separatedValues.postData.length; i++) {
+                promiseArray.push(await brmPostRequest(controllerName, separatedValues.postData[i]));
+            }
+
+            const results = await Promise.all(promiseArray);
+            console.log(results);
+            //const postedData = await brmPostRequest(controllerName, record);
         }
 
         //Send PUT request for new Data to update the existing records in the database
         if (Object.keys(separatedValues.putData).length >= 1) {
             //const puttedData = await brmPutRequest(controllerName, separatedValues.putData);
-            //console.log("putData: ", separatedValues.putData);
         };
 
     }
