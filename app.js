@@ -369,7 +369,7 @@ async function updateBrgRdwy(controllerName) {
 
             //Loop through each record and send as a PUT request
             for (let i = 0; i < separatedValues.putData.length; i++) {
-                promiseArray.push(await brmPostRequest(controllerName, separatedValues.putData[i]));
+                promiseArray.push(await brmPutRequest(controllerName, separatedValues.putData[i]));
             };
 
             //Resolve promise Array to a new variable for future processing
