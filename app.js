@@ -226,18 +226,12 @@ async function brmPostRequest(controllerName, body) {
 
 
 
-/*********************TODO************************/
-//This needs work to get the body portion fixed.  Currently does not recognize the object.
-//Need to possibly remove the keys [0,1,2,3,4 etc] first.  IE remove the top level keys.  
-//Or issue might be that the BrM API cannot accept more than one key as a PUT request but this seems unlikely. 
-//Error is more likely on my end in correctly forming up the body of the request. 
-
 /******** Generic BrM PUT Request ***********/
 //Send PUT request to BrM API and return results
 async function brmPutRequest(controllerName, body) {
 
     //Get URL for BrM Requests
-    const brmURL = urlBuilderBRM(controllerName);
+    const brmURL = urlBuilderBRM(controllerName) + "/" + body.BRIDGE_GD;
 
     //Get Headers for BrM Requests
     const headers = await headerBuilderBRM();
@@ -249,11 +243,17 @@ async function brmPutRequest(controllerName, body) {
             let brmResponse = await fetch(brmURL, {
                 "method": "PUT",
                 "headers": headers,
-                "data": body
+                "body": JSON.stringify(body)
             });
 
-            //Return the response
-            return await brmResponse.json();
+            //If return status is ok, return a promise of the guid of the record that was updated
+            /**This is necessary because a normal 200 or 204 response returns no data
+             * This way allows for the guid that was updated to be captured and logged**/
+            if (brmResponse.status === 200 || brmResponse.status === 204) {
+                return Promise.resolve(body.BRIDGE_GD);
+            } else {
+                return brmResponse.json();
+            };
         }
         catch(error) {
             console.log("Error sending PUT request to " + controllerName);
