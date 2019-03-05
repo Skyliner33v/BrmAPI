@@ -348,20 +348,33 @@ async function updateBrgRdwy(controllerName) {
         //Send POST request for new Data to be added to the database
         if (Object.keys(separatedValues.postData).length >= 1) {
 
+            //Initialize array to hold promises before resolving
             let promiseArray = [];
 
+            //Loop through each record and send as a POST request
             for (let i = 0; i < separatedValues.postData.length; i++) {
                 promiseArray.push(await brmPostRequest(controllerName, separatedValues.postData[i]));
-            }
+            };
 
-            const results = await Promise.all(promiseArray);
-            console.log(results);
-            //const postedData = await brmPostRequest(controllerName, record);
+            //Resolve promise Array to a new variable for future processing
+            const postResults = await Promise.all(promiseArray);
+            console.log(postResults);
         }
 
         //Send PUT request for new Data to update the existing records in the database
         if (Object.keys(separatedValues.putData).length >= 1) {
-            //const puttedData = await brmPutRequest(controllerName, separatedValues.putData);
+
+            //Initialize array to hold promises before resolving
+            let promiseArray = [];
+
+            //Loop through each record and send as a PUT request
+            for (let i = 0; i < separatedValues.putData.length; i++) {
+                promiseArray.push(await brmPostRequest(controllerName, separatedValues.putData[i]));
+            };
+
+            //Resolve promise Array to a new variable for future processing
+            const putResults = await Promise.all(promiseArray);
+            console.log(putResults);
         };
 
     }
