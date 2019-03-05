@@ -358,6 +358,8 @@ async function updateBrgRdwy(controllerName) {
 
             //Resolve promise Array to a new variable for future processing
             const postResults = await Promise.all(promiseArray);
+            
+            //Hold area for sending postResults back to database for tracking
             console.log(postResults);
         }
 
@@ -374,9 +376,10 @@ async function updateBrgRdwy(controllerName) {
 
             //Resolve promise Array to a new variable for future processing
             const putResults = await Promise.all(promiseArray);
+
+            //Hold area for sending postResults back to database for tracking
             console.log(putResults);
         };
-
     }
     catch(error){
         console.log(error);
@@ -402,8 +405,27 @@ async function updateTable(controllerName) {
             //If updating Inspections or Element Data, ok to just send the POST request immediately
             case "inspections":
             case "elementData":
+
+                //First send GET request to AssetManagement Database to retrieve new data
                 const amResult = await amGetRequest(controllerName);
-                const brmResult = await brmPostRequest(controllerName, amResult);
+
+                //If there is new data, send POST requests for new data to be added to the database
+                if (Object.keys(amResult).length >= 1) {
+
+                    //Initialize array to hold promises before resolving
+                    let promiseArray = [];
+
+                    //Loop through each record and send as a POST request
+                    for (let i = 0; i < amData.length; i++) {
+                        promiseArray.push(await brmPostRequest(controllerName, amData[i]));
+                    };
+
+                    //Resolve promise Array to a new variable for future processing
+                    const postResults = await Promise.all(promiseArray);
+                    
+                    //Hold area for sending postResults back to database for tracking
+                    console.log(postResults);
+                }
                 break;
         };
 
