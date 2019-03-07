@@ -81,30 +81,23 @@ async function getAuth() {
     //Get database value
     const dbValue = getDbValue();
 
-    //Check if a database is selected first.  If not, return a false value
-    if (dbValue != "default") {
+    //Setup request url and header info
+    const authURL = "http://localhost:9000/api/auth/APILogin";
+    const headers = {
+        "Accept": "application/JSON",
+        "Authorization": "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
+        "database_id": "'" + dbValue + "'"
+    };
 
-        //Setup request url and header info
-        const authURL = "http://localhost:9000/api/auth/APILogin";
-        const headers = {
-            "Accept": "application/JSON",
-            "Authorization": "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
-            "database_id": "'" + dbValue + "'"
-        };
+    //Set Get Request
+    let response = await fetch(authURL, {
+        method: "GET",
+        headers: headers
+    });
 
-        //Set Get Request
-        let response = await fetch(authURL, {
-            method: "GET",
-            headers: headers
-        });
-
-        //Process response from the request and return the authorization token
-        let result = await response.json();
-        return result.auth_token;
-    } else {
-        return false;  
-    }
-    
+    //Process response from the request and return the authorization token
+    let result = await response.json();
+    return result.auth_token;
 };
 
 
@@ -112,18 +105,12 @@ async function getAuth() {
 async function headerBuilderBRM() {
     //Get authorization token //Add this to the header instead
     const authToken = await getAuth();
-
-    if (authToken != false) {
-        let headers = {
-            "Accept": "application/JSON",
-            "content-type": "application/JSON",
-            "auth_token": authToken
-        };
-        return headers;
-
-    } else {
-        return false;
-    }
+    let headers = {
+        "Accept": "application/JSON",
+        "content-type": "application/JSON",
+        "auth_token": authToken
+    };
+    return headers;
 };
 
 
@@ -165,32 +152,21 @@ async function brmGetRequest(controllerName) {
     const headers = await headerBuilderBRM();
 
     //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
-    if (headers != false) {
-        try {
-            //Send GET Request
-            let brmResponse = await fetch(brmURL, {
-                "method": "GET",
-                "headers": headers,
-            });
+    try {
+        //Send GET Request
+        let brmResponse = await fetch(brmURL, {
+            "method": "GET",
+            "headers": headers,
+        });
 
-            //Process response
-            return await brmResponse.json();
-        }
-        catch(error) {
-            console.log("Error sending GET request to " + controllerName);
-        };
-
-    } else {
-        alert("Please select a database first")
+        //Process response
+        return await brmResponse.json();
+    }
+    catch(error) {
+        console.log("Error sending GET request to " + controllerName);
     };
 }; 
 
-
-/*********************TODO************************/
-//This needs work to get the body portion fixed.  Currently does not recognize the object.
-//Need to possibly remove the keys [0,1,2,3,4 etc] first.  IE remove the top level keys.  
-//Or issue might be that the BrM API cannot accept more than one key as a POST request but this seems unlikely. 
-//Error is more likely on my end in correctly forming up the body of the request. 
 
 /******** Generic BrM POST Request ***********/
 //Send POST request to BrM API and return results
@@ -203,24 +179,28 @@ async function brmPostRequest(controllerName, body) {
     const headers = await headerBuilderBRM();
 
     //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
-    if (headers != false) {
-        try {
-                //Send GET Request
-                let brmResponse = await fetch(brmURL, {
-                    "method": "POST",
-                    "headers": headers,
-                    "body": JSON.stringify(body)
-                });
+    try {
+        //Send GET Request
+        let brmResponse = await fetch(brmURL, {
+            "method": "POST",
+            "headers": headers,
+            "body": JSON.stringify(body)
+        });
 
-                //Return the response promise
-                return await brmResponse.json();
-        }
-        catch(error) {
-            console.log("Error sending POST request to " + controllerName);
+        //If return status is ok, return a promise of the guid of the record that was updated
+        /**This is necessary because a normal 200 or 204 response returns no data
+        * This way allows for the guid that was updated to be captured and logged**/
+        if (brmResponse.status === 200 || brmResponse.status === 204) {
+            return Promise.resolve(body.BRIDGE_GD);
+        } else {
+            let failedRequest = {
+                "BRIDGE_GD": body.BRIDGE_GD, 
+                "error": await brmResponse.json()}
+            return Promise.resolve(failedRequest); 
         };
-
-    } else {
-        alert("Please select a database first")
+    }
+    catch(error) {
+        console.log("Error sending POST request to " + controllerName);
     };
 };
 
@@ -237,36 +217,34 @@ async function brmPutRequest(controllerName, body) {
     const headers = await headerBuilderBRM();
 
     //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
-    if (headers != false) {
-        try {
-            //Send GET Request
-            let brmResponse = await fetch(brmURL, {
-                "method": "PUT",
-                "headers": headers,
-                "body": JSON.stringify(body)
-            });
+    try {
+        //Send GET Request
+        let brmResponse = await fetch(brmURL, {
+            "method": "PUT",
+            "headers": headers,
+            "body": JSON.stringify(body)
+        });
 
-            //If return status is ok, return a promise of the guid of the record that was updated
-            /**This is necessary because a normal 200 or 204 response returns no data
-             * This way allows for the guid that was updated to be captured and logged**/
-            if (brmResponse.status === 200 || brmResponse.status === 204) {
-                return Promise.resolve(body.BRIDGE_GD);
-            } else {
-                return brmResponse.json();
-            };
-        }
-        catch(error) {
-            console.log("Error sending PUT request to " + controllerName);
+        //If return status is ok, return a promise of the guid of the record that was updated
+        /**This is necessary because a normal 200 or 204 response returns no data
+         * This way allows for the guid that was updated to be captured and logged**/
+        if (brmResponse.status === 200 || brmResponse.status === 204) {
+            return Promise.resolve(body.BRIDGE_GD);
+        } else {
+            let failedRequest = {
+                "BRIDGE_GD": body.BRIDGE_GD, 
+                "error": await brmResponse.json()}
+            return Promise.resolve(failedRequest);  
         };
-
-    } else {
-        alert("Please select a database first")
+    }
+    catch(error) {
+        console.log("Error sending PUT request to " + controllerName);
     };
 };
 
 
 
-//Analyze list of PUT bridges.  Set the "Obsolete" flag if the structure is obsolete, otherwise leave alone.  Also strips out obsolete date after analyzing.  
+//Analyze list of PUT bridges.  Set the "Obsolete" flag if the structure is obsolete, otherwise leave alone.    
 //This can easily be extended to include other flags in the future.
 // 0 = Unknown
 // 1 = Inactive
@@ -295,28 +273,28 @@ function flagInactiveBridges(putData) {
 //Compare data in Brm and AssetManagement Tables
 function compareData(controllerName, brmData, amData) {
 
-    //Evaluate which controller first
-    if(controllerName == "bridges") {
-        //Create list of matching bridges to be used as a PUT request
-        var putData = amData.filter(amGuid => 
-            brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
+        //Evaluate which controller first
+        if(controllerName == "bridges") {
+            //Create list of matching bridges to be used as a PUT request
+            var putData = amData.filter(amGuid => 
+                brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
 
-        //Create list of non-matching bridges to be used as a POST request
-        var postData = amData.filter(amGuid => 
-            !brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
-    } 
-    else if (controllerName == "roadway") {
-        //Create list of matching roadways to be used as a PUT request
-        var putData = amData.filter(amGuid => 
-            brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
+            //Create list of non-matching bridges to be used as a POST request
+            var postData = amData.filter(amGuid => 
+                !brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
+        } 
+        else if (controllerName == "roadway") {
+            //Create list of matching roadways to be used as a PUT request
+            var putData = amData.filter(amGuid => 
+                brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
 
-        //Create list of non-matching roadways to be used as a POST request
-        var postData = amData.filter(amGuid => 
-            !brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
-    }
-    else {
-        alert("Error comparing BrM and AssetManagement Data");
-    }; 
+            //Create list of non-matching roadways to be used as a POST request
+            var postData = amData.filter(amGuid => 
+                !brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
+        }
+        else {
+            alert("Error comparing BrM and AssetManagement Data");
+        }; 
 
     //If is "BRIDGES" data, then send the PUT list off to check for valid obsolete_dates and return the modified list
     if (controllerName == "bridges"){
@@ -332,6 +310,10 @@ function compareData(controllerName, brmData, amData) {
 
 
 /******** Inpsect and separate the new data before updating the BRIDGE or ROADWAY tables in BrM ***********/
+/*This method using promise.all is ideal because it will only resolve after all the requests have been completed.
+* It will also capture any errors within the array to be processed after resolving.  An error will not cause the process to fail
+* Any error found will removed from the array and sent to another function for logging*/
+
 //This function will inspect the new data and compare it to the data already in BrM to determine if the new data should be a POST or PUT request
 async function updateBrgRdwy(controllerName) {
     try {
@@ -356,10 +338,10 @@ async function updateBrgRdwy(controllerName) {
                 promiseArray.push(await brmPostRequest(controllerName, separatedValues.postData[i]));
             };
 
-            //Resolve promise Array to a new variable for future processing
+            //Resolve promise Array to a new array for future processing
             const postResults = await Promise.all(promiseArray);
             
-            //Hold area for sending postResults back to database for tracking
+            //Hold area for sending postResults back to database for tracking and error handling
             console.log(postResults);
         }
 
@@ -392,7 +374,12 @@ async function updateBrgRdwy(controllerName) {
 /******** Update BrM Tables with AssetManagement Data ***********/
 //Update Table in BrM from data in AssetManagement depending on which button(controller) was clicked.
 async function updateTable(controllerName) {
-    try {
+
+    let dropdownValue = document.getElementById("dbDropdown").value;
+    if (dropdownValue === 'default') {
+        alert ("Select a database first")
+    } else {
+
         //Run different checks depending on which controller is selected before inserting data
         switch(controllerName) {
 
@@ -409,34 +396,33 @@ async function updateTable(controllerName) {
                 //First send GET request to AssetManagement Database to retrieve new data
                 const amResult = await amGetRequest(controllerName);
 
-                //If there is new data, send POST requests for new data to be added to the database
-                if (Object.keys(amResult).length >= 1) {
+                try {
+                    //If there is new data, send POST requests for new data to be added to the database
+                    if (Object.keys(amResult).length >= 1) {
 
-                    //Initialize array to hold promises before resolving
-                    let promiseArray = [];
+                        //Initialize array to hold promises before resolving
+                        let promiseArray = [];
 
-                    //Loop through each record and send as a POST request
-                    for (let i = 0; i < amData.length; i++) {
-                        promiseArray.push(await brmPostRequest(controllerName, amData[i]));
-                    };
+                        //Loop through each record and send as a POST request
+                        for (let i = 0; i < amData.length; i++) {
+                            promiseArray.push(await brmPostRequest(controllerName, amData[i]));
+                        };
 
-                    //Resolve promise Array to a new variable for future processing
-                    const postResults = await Promise.all(promiseArray);
-                    
-                    //Hold area for sending postResults back to database for tracking
-                    console.log(postResults);
+                        //Resolve promise Array to a new variable for future processing
+                        const postResults = await Promise.all(promiseArray);
+                        
+                        //Hold area for sending postResults back to database for tracking
+                        console.log(postResults);
+                    }
+                    break;
                 }
-                break;
-        };
-
-        //Update AssetManagement Tables with data relating to how many records were Inserted or Updated into BrM
-
-
-    }
-    catch(error) {
-        console.log(error);
-    }
+                catch(error){
+                    console.log(error);
+                };
+            };
+    };
 };
+
 
 
 
