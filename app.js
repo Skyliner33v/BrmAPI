@@ -361,6 +361,7 @@ async function updateBrgRdwy(controllerName) {
 
             //Hold area for sending postResults back to database for tracking
             console.log(putResults);
+
         };
     }
     catch(error){
@@ -396,32 +397,28 @@ async function updateTable(controllerName) {
                 //First send GET request to AssetManagement Database to retrieve new data
                 const amResult = await amGetRequest(controllerName);
 
-                try {
-                    //If there is new data, send POST requests for new data to be added to the database
-                    if (Object.keys(amResult).length >= 1) {
+                //If there is new data, send POST requests for new data to be added to the database
+                if (Object.keys(amResult).length >= 1) {
 
-                        //Initialize array to hold promises before resolving
-                        let promiseArray = [];
+                    //Initialize array to hold promises before resolving
+                    let promiseArray = [];
 
-                        //Loop through each record and send as a POST request
-                        for (let i = 0; i < amData.length; i++) {
-                            promiseArray.push(await brmPostRequest(controllerName, amData[i]));
-                        };
+                    //Loop through each record and send as a POST request
+                    for (let i = 0; i < amData.length; i++) {
+                        promiseArray.push(await brmPostRequest(controllerName, amData[i]));
+                    };
 
-                        //Resolve promise Array to a new variable for future processing
-                        const postResults = await Promise.all(promiseArray);
-                        
-                        //Hold area for sending postResults back to database for tracking
-                        console.log(postResults);
-                    }
-                    break;
-                }
-                catch(error){
-                    console.log(error);
+                    //Resolve promise Array to a new variable for future processing
+                    var postResults = await Promise.all(promiseArray); 
                 };
-            };
+                    
+                    //Hold area for sending postResults back to database for tracking
+                    console.log(postResults);
+                break;
+        };
     };
 };
+
 
 
 
