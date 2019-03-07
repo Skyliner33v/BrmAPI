@@ -191,7 +191,13 @@ async function brmPostRequest(controllerName, body) {
         /**This is necessary because a normal 200 or 204 response returns no data
         * This way allows for the guid that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
-            return Promise.resolve(body.BRIDGE_GD);
+            if (controllerName ==='bridges') {
+                return Promise.resolve(body.BRIDGE_GD);
+            } else if (controllerName = 'roadway') {
+                return Promise.resolve(body.ROADWAY_GD);
+            } else {
+                return Promise.resolve("none");
+            }
         } else if (controllerName = 'bridges') {
             let failedRequest = {
                 "BRIDGE_GD": body.BRIDGE_GD, 
@@ -245,7 +251,13 @@ async function brmPutRequest(controllerName, body) {
         /**This is necessary because a normal 200 or 204 response returns no data
          * This way allows for the guid that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
-            return Promise.resolve(body.BRIDGE_GD);
+            if (controllerName ==='bridges') {
+                return Promise.resolve(body.BRIDGE_GD);
+            } else if (controllerName = 'roadway') {
+                return Promise.resolve(body.ROADWAY_GD);
+            } else {
+                return Promise.resolve("none");
+            }
         } else if (controllerName = 'bridges') {
             let failedRequest = {
                 "BRIDGE_GD": body.BRIDGE_GD, 
