@@ -192,11 +192,18 @@ async function brmPostRequest(controllerName, body) {
         * This way allows for the guid that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
             return Promise.resolve(body.BRIDGE_GD);
-        } else {
+        } else if (controllerName = 'bridges') {
             let failedRequest = {
                 "BRIDGE_GD": body.BRIDGE_GD, 
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest); 
+        } else if (controllerName = 'roadway') {
+            let failedRequest = {
+                "ROADWAY_GD": body.BRIDGE_GD, 
+                "error": await brmResponse.json()}
+            return Promise.resolve(failedRequest);  
+        } else {
+            return Promise.resolve("none");
         };
     }
     catch(error) {
@@ -209,6 +216,15 @@ async function brmPostRequest(controllerName, body) {
 /******** Generic BrM PUT Request ***********/
 //Send PUT request to BrM API and return results
 async function brmPutRequest(controllerName, body) {
+
+    //Set the "Obsolete" flag if the structure is obsolete, otherwise leave alone.
+    if (controllerName === 'bridges') {
+        //If the obsolete_date value is anything else but null or undefined, then mark the bridge as "Inactive"
+        let obsDate = body.obsolete_date;
+        if(!(obsDate == null || obsDate == undefined)) {
+            body.BRIDGE_STATUS = 5;
+        };
+    };
 
     //Get URL for BrM Requests
     const brmURL = urlBuilderBRM(controllerName) + "/" + body.BRIDGE_GD;
@@ -230,42 +246,23 @@ async function brmPutRequest(controllerName, body) {
          * This way allows for the guid that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
             return Promise.resolve(body.BRIDGE_GD);
-        } else {
+        } else if (controllerName = 'bridges') {
             let failedRequest = {
                 "BRIDGE_GD": body.BRIDGE_GD, 
                 "error": await brmResponse.json()}
+            return Promise.resolve(failedRequest); 
+        } else if (controllerName = 'roadway') {
+            let failedRequest = {
+                "ROADWAY_GD": body.BRIDGE_GD, 
+                "error": await brmResponse.json()}
             return Promise.resolve(failedRequest);  
+        } else {
+            return Promise.resolve("none");
         };
     }
     catch(error) {
         console.log("Error sending PUT request to " + controllerName);
     };
-};
-
-
-
-//Analyze list of PUT bridges.  Set the "Obsolete" flag if the structure is obsolete, otherwise leave alone.    
-//This can easily be extended to include other flags in the future.
-// 0 = Unknown
-// 1 = Inactive
-// 2 = Closed
-// 3 = Active
-// 4 = Proposed
-// 5 = Obsolete
-function flagInactiveBridges(putData) {
-
-    //Loop through each bridge and check the obsolete_date value
-    for (let i = 0; i < putData.length; i++) {
-
-        //If the obsolete_date value is anything else but null or undefined, then mark the bridge as "Inactive"
-        let obsDate = putData[i].obsolete_date;
-        if(!(obsDate == null || obsDate == undefined)) {
-            putData[i].BRIDGE_STATUS = 5;
-        };
-    };
-
-    //Return the list of PUT bridges after analyzing
-    return putData;
 };
 
 
