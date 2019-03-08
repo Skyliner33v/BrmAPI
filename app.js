@@ -253,24 +253,30 @@ async function brmPutRequest(controllerName, body) {
         if (brmResponse.status === 200 || brmResponse.status === 204) {
             if (controllerName ==='bridges') {
                 return Promise.resolve(body.BRIDGE_GD);
+
             } else if (controllerName = 'roadway') {
                 return Promise.resolve(body.ROADWAY_GD);
+
             } else {
                 return Promise.resolve("none");
             }
+
         } else if (controllerName = 'bridges') {
             let failedRequest = {
                 "BRIDGE_GD": body.BRIDGE_GD, 
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest); 
+
         } else if (controllerName = 'roadway') {
             let failedRequest = {
                 "ROADWAY_GD": body.BRIDGE_GD, 
                 "error": await brmResponse.json()}
-            return Promise.resolve(failedRequest);  
+            return Promise.resolve(failedRequest); 
+
         } else {
             return Promise.resolve("none");
         };
+
     }
     catch(error) {
         console.log("Error sending PUT request to " + controllerName);
@@ -304,11 +310,6 @@ function compareData(controllerName, brmData, amData) {
         else {
             alert("Error comparing BrM and AssetManagement Data");
         }; 
-
-    //If is "BRIDGES" data, then send the PUT list off to check for valid obsolete_dates and return the modified list
-    if (controllerName == "bridges"){
-        flagInactiveBridges(putData);
-    };
 
     //Return the separated data as an object
     return {postData, putData};
@@ -370,24 +371,54 @@ async function updateBrgRdwy(controllerName) {
 
             //Hold area for sending postResults back to database for tracking
             console.log(putResults);
-
         };
+
     }
     catch(error){
         console.log(error);
     };
 };
 
+/****************** Enable next buttons **********************/
+//Update button availablity depending on which controller was last updated
+function enableNextButton (controllerName) {
 
+    switch (controllerName) {
+        case "bridges":
+            document.getElementById("importRoadwayBtn").removeAttribute("disabled");
+            document.getElementById("importBridgesBtn").setAttribute("disabled", true);
+            break;
+        case "roadway":
+            document.getElementById("importInspectionsBtn").removeAttribute("disabled");
+            document.getElementById("importRoadwayBtn").setAttribute("disabled", true);
+            break;
+        case "inspections":
+            document.getElementById("importElemDataBtn").removeAttribute("disabled");
+            document.getElementById("importInspectionsBtn").setAttribute("disabled", true);
+            break;
+        //If last button is selected, reset the button order.  
+        case "elementData":
+            document.getElementById("importRoadwayBtn").setAttribute("disabled", true);
+            document.getElementById("importInspectionsBtn").setAttribute("disabled", true);
+            document.getElementById("importElemDataBtn").setAttribute("disabled", true);
+            break;
+    };
+
+}
 
 
 /******** Update BrM Tables with AssetManagement Data ***********/
 //Update Table in BrM from data in AssetManagement depending on which button(controller) was clicked.
 async function updateTable(controllerName) {
 
+    //First get controller name
     let dropdownValue = document.getElementById("dbDropdown").value;
+
+    //If no controller selected, alert the user and end the process
     if (dropdownValue === 'default') {
         alert ("Select a database first")
+
+    //Otherwise proceed
     } else {
 
         //Run different checks depending on which controller is selected before inserting data
@@ -396,7 +427,11 @@ async function updateTable(controllerName) {
             //If updating bridges or roadway, run through checks first
             case "bridges":
             case "roadway":
-                updateBrgRdwy(controllerName);                
+                updateBrgRdwy(controllerName);
+                
+                //Enable next available button
+                enableNextButton(controllerName);   
+
                 break;
 
             //If updating Inspections or Element Data, ok to just send the POST request immediately
@@ -413,16 +448,20 @@ async function updateTable(controllerName) {
                     let promiseArray = [];
 
                     //Loop through each record and send as a POST request
-                    for (let i = 0; i < amData.length; i++) {
-                        promiseArray.push(await brmPostRequest(controllerName, amData[i]));
+                    for (let i = 0; i < amResult.length; i++) {
+                        promiseArray.push(await brmPostRequest(controllerName, amResult[i]));
                     };
 
                     //Resolve promise Array to a new variable for future processing
                     var postResults = await Promise.all(promiseArray); 
                 };
-                    
-                    //Hold area for sending postResults back to database for tracking
-                    console.log(postResults);
+
+                //Hold area for sending postResults back to database for tracking
+                console.log(postResults);
+
+                //Enable next available button
+                enableNextButton(controllerName);
+
                 break;
         };
     };
