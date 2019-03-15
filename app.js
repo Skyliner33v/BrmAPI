@@ -215,9 +215,19 @@ async function brmPostRequest(controllerName, body) {
         * This way allows for the guid that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
             if (controllerName ==='bridges') {
-                return Promise.resolve(body.BRIDGE_GD);
+                let passedRequest = {
+                    "status": "Pass",
+                    "BRIDGE_GD": body.BRIDGE_GD,
+                    "error" : "none"
+                }
+                return Promise.resolve(passedRequest);
             } else if (controllerName = 'roadway') {
-                return Promise.resolve(body.ROADWAY_GD);
+                let passedRequest = {
+                    "status": "Pass",
+                    "ROADWAY_GD": body.ROADWAY_GD,
+                    "error" : "none"
+                }
+                return Promise.resolve(passedRequest);
             } else {
                 return Promise.resolve("none");
             }
@@ -226,7 +236,10 @@ async function brmPostRequest(controllerName, body) {
         //Returns promise containing bridge guid and the error message
         } else if (controllerName = 'bridges') {
             let failedRequest = {
+                "status": "Fail",
                 "BRIDGE_GD": body.BRIDGE_GD, 
+                "BRIDGE_ID": body.BRIDGE_ID,
+                "STRUCT_NUM": body.STRUCT_NUM,
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest);
 
@@ -234,7 +247,10 @@ async function brmPostRequest(controllerName, body) {
         //Returns promise containing roadway guid and the error message
         } else if (controllerName = 'roadway') {
             let failedRequest = {
+                "status": "Fail",
                 "ROADWAY_GD": body.BRIDGE_GD, 
+                "BRIDGE_GD": body.BRIDGE_GD,
+                "ROADWAY_NAME": body.ROADWAY_NAME,
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest);  
 
@@ -300,20 +316,24 @@ async function brmPutRequest(controllerName, body) {
             }
 
         //Handle failed responses to the BRIDGE table
-        //Returns promise containing bridge guid and error message
+        //Returns promise containing bridge data and error message
         } else if (controllerName = 'bridges') {
             let failedRequest = {
                 "status": "Fail",
                 "BRIDGE_GD": body.BRIDGE_GD, 
+                "BRIDGE_ID": body.BRIDGE_ID,
+                "STRUCT_NUM": body.STRUCT_NUM,
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest); 
 
         //Handle failed responses to the ROADWAY table
-        //Returns promise containing roadway guid and error message
+        //Returns promise containing roadway data and error message
         } else if (controllerName = 'roadway') {
             let failedRequest = {
                 "status": "Fail",
                 "ROADWAY_GD": body.BRIDGE_GD, 
+                "BRIDGE_GD": body.BRIDGE_GD,
+                "ROADWAY_NAME": body.ROADWAY_NAME,
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest); 
 
@@ -372,7 +392,7 @@ function amPostDataBuilder (apiType, controllerName, amPostData) {
         } else if (amPostData[i].status === 'Fail') {
             tempFailed.push(amPostData[i]);
         } else {
-            console.log("Error in amPostDataBuilder()")
+            console.log("ERROR in amPostDataBuilder")
         }
     }; 
 
@@ -396,8 +416,7 @@ function amPostDataBuilder (apiType, controllerName, amPostData) {
         "datePosted": datetime
     };
 
-    console.log("passResults, failResults", passResults, failResults)
-    return {passResults, failResults};
+    return {passResults, failResults, tempPassed, tempFailed};
 }
 
 
@@ -442,7 +461,7 @@ async function updateBrgRdwy(controllerName) {
             } 
             if (separatedPostResults.failResults.numRows >= 1) {
                 alert("Failed Transfers! Check console."); 
-                console.log(separatedPostResults.failResults); //need to process this further to another database maybe?
+                console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
             };
         };
 
@@ -462,8 +481,6 @@ async function updateBrgRdwy(controllerName) {
 
             //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
             const separatedPutResults = amPostDataBuilder("PUT", controllerName, putResults);
-            console.log(typeof JSON.stringify(separatedPutResults.passResults))
-            console.log(JSON.stringify(separatedPutResults.passResults))
 
             //If contains data, then send POST requests
             if (separatedPutResults.passResults.numRows >= 1) {
@@ -471,7 +488,7 @@ async function updateBrgRdwy(controllerName) {
             } 
             if (separatedPutResults.failResults.numRows >= 1) {
                 alert("Failed Transfers! Check console."); 
-                console.log(separatedPutResults.failResults);
+                console.dir(separatedPutResults.tempFailed);
             };
         };
 
