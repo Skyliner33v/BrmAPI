@@ -211,8 +211,8 @@ async function brmPostRequest(controllerName, body) {
         });
 
         //If return status is ok, return a promise of the guid of the record that was updated
-        /**This is necessary because a normal 200 or 204 response returns no data
-        * This way allows for the guid that was updated to be captured and logged**/
+        /**This is necessary because a normal 200 or 204 response returns back no data
+        * This way allows for the guid and other data that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
             if (controllerName ==='bridges') {
                 let passedRequest = {
@@ -294,8 +294,8 @@ async function brmPutRequest(controllerName, body) {
         });
 
         //If return status is ok, return a promise of the guid of the record that was updated
-        /**This is necessary because a normal 200 or 204 response returns no data
-         * This way allows for the guid that was updated to be captured and logged**/
+        /**This is necessary because a normal 200 or 204 response returns back no data
+        * This way allows for the guid and other data that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
             if (controllerName ==='bridges') {
                 let passedRequest = {
@@ -398,7 +398,8 @@ function amPostDataBuilder (apiType, controllerName, amPostData) {
 
     //Create timestamp
     let today = new Date();
-    let datetime = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + " " + today.getHours() + ':' + today.getMinutes() + ":" + today.getSeconds();
+    let datetime = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + " " + today.getHours() + ':' + today.getMinutes() + ":" + today.getSeconds() + " UTC";
+    console.log(datetime)
 
     //Create data that contains data about successful requests that will be used in the POST request to the AssetManagement Database
     let passResults = {
