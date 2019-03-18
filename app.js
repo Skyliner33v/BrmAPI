@@ -27,7 +27,7 @@ async function amGetRequest(controllerName) {
 //Send POST request to Asset Management API and return results
 async function amPostRequest(bodyData) {
 
-    //Setup AssetManagement GET request URL
+    //Setup AssetManagement POST request URL
     const amURL = "http://localhost:8081/api/transactions"
 
     //Send POST Request
@@ -42,7 +42,15 @@ async function amPostRequest(bodyData) {
 
     //Return the response
     const result =  await amResponse.text();
-    alert("AssetManagment POST Success!")
+
+    //If status is 200, alert the user to a successful POST otherwise 
+    if (result.statusCode === 200) {
+        alert("AssetManagment POST Success!")
+    } else {
+        alert("AssetManagment POST Failure.\n Check console for error log")
+        console.error(result.body)
+    }
+        
 };
 
 
@@ -381,7 +389,7 @@ function compareData(controllerName, brmData, amData) {
 };
 
 
-function amPostDataBuilder (apiType, controllerName, amPostData) {
+function amPostDataBuilder (apiRequestType, controllerName, amPostData) {
     let tempPassed = [];
     let tempFailed = [];
 
@@ -399,12 +407,11 @@ function amPostDataBuilder (apiType, controllerName, amPostData) {
     //Create timestamp
     let today = new Date();
     let datetime = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + " " + today.getHours() + ':' + today.getMinutes() + ":" + today.getSeconds() + " UTC";
-    console.log(datetime)
 
     //Create data that contains data about successful requests that will be used in the POST request to the AssetManagement Database
     let passResults = {
         "tableName": controllerName,
-        "apiType": apiType,
+        "apiRequestType": apiRequestType,
         "numRows": tempPassed.length,
         "datePosted": datetime
     };
@@ -412,7 +419,7 @@ function amPostDataBuilder (apiType, controllerName, amPostData) {
     //Create data that contains data about failed requests that will be used in the POST request to the AssetManagement Database
     let failResults = {
         "tableName": controllerName,
-        "apiType": apiType,
+        "apiRequestType": apiRequestType,
         "numRows": tempFailed.length,
         "datePosted": datetime
     };
@@ -566,20 +573,28 @@ async function updateTable(controllerName) {
                     //Initialize array to hold promises before resolving
                     let promiseArray = [];
 
-                    //Loop through each record and send as a POST request
+                    //Loop through each record and send as a POST request.  Returns an array of promises that need to be resolved
                     for (let i = 0; i < amResult.length; i++) {
                         promiseArray.push(await brmPostRequest(controllerName, amResult[i]));
                     };
 
                     //Resolve promise Array to a new variable for future processing
                     var postResults = await Promise.all(promiseArray); 
-                };
 
-                //Hold area for sending postResults back to database for tracking
-                console.log(postResults);
+                    //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
+                    const separatedPostResults = amPostDataBuilder("POST", controllerName, postResults);
 
-                //Enable next available button
-                enableNextButton(controllerName);
+                    //If contains data, then send POST requests
+                    if (separatedPostResults.passResults.numRows >= 1) {
+                        amPostRequest(separatedPostResults.passResults);
+                    } 
+                    if (separatedPostResults.failResults.numRows >= 1) {
+                        alert("Failed Transfers! Check console."); 
+                        console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
+                    };
+                } else if (Object.keys(amResult).length === 0) {
+                    alert("No new records to insert")
+                }
 
                 break;
         };
