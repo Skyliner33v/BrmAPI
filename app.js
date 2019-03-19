@@ -157,6 +157,9 @@ function urlBuilderBRM(controllerName) {
         case "bridges":
             restURL = "Bridge";
             break;
+        case "structureUnit":
+            restURL = "StructureUnit";
+            break;
         case "inspections":
             restURL =  "Inspection";
             break;
@@ -236,6 +239,13 @@ async function brmPostRequest(controllerName, body) {
                     "error" : "none"
                 }
                 return Promise.resolve(passedRequest);
+            } else if (controllerName = 'structureUnit') {
+                let passedRequest = {
+                    "status": "Pass",
+                    "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD,
+                    "error" : "none"
+                }
+                return Promise.resolve(passedRequest);
             } else {
                 return Promise.resolve("none");
             }
@@ -262,7 +272,15 @@ async function brmPostRequest(controllerName, body) {
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest);  
 
-        } else {
+        } else if (controllerName = 'structureUnit') {
+            let failedRequest = {
+                "status": "Fail",
+                "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD, 
+                "BRIDGE_GD": body.BRIDGE_GD,
+                "error": await brmResponse.json()}
+            return Promise.resolve(failedRequest);  
+
+        } Else {
             return Promise.resolve("none");
         };
     }
@@ -319,6 +337,14 @@ async function brmPutRequest(controllerName, body) {
                     "error" : "none"
                 }
                 return Promise.resolve(passedRequest);
+            } else if (controllerName = 'structureUnit') {
+                let passedRequest = {
+                    "status": "Pass",
+                    "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD,
+                    "error" : "none"
+                }
+                return Promise.resolve(passedRequest);
+            
             } else {
                 return Promise.resolve("none");
             }
@@ -344,6 +370,14 @@ async function brmPutRequest(controllerName, body) {
                 "ROADWAY_NAME": body.ROADWAY_NAME,
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest); 
+
+        } else if (controllerName = 'structureUnit') {
+            let failedRequest = {
+                "status": "Fail",
+                "STRUCTURE_UNIT_GD": body.BRIDGE_GD, 
+                "BRIDGE_GD": body.BRIDGE_GD,
+                "error": await brmResponse.json()}
+            return Promise.resolve(failedRequest);
 
         } else {
             return Promise.resolve("none");
@@ -378,6 +412,15 @@ function compareData(controllerName, brmData, amData) {
             //Create list of non-matching roadways to be used as a POST request
             var postData = amData.filter(amGuid => 
                 !brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
+        }
+        else if (controllerName == "structureUnit") {
+            //Create list of matching roadways to be used as a PUT request
+            var putData = amData.filter(amGuid => 
+                brmData.some(bmGuid => (bmGuid.STRUCTURE_UNIT_GD === amGuid.STRUCTURE_UNIT_GD)));
+
+            //Create list of non-matching roadways to be used as a POST request
+            var postData = amData.filter(amGuid => 
+                !brmData.some(bmGuid => (bmGuid.STRUCTURE_UNIT_GD === amGuid.STRUCTURE_UNIT_GD)));
         }
         else {
             alert("Error comparing BrM and AssetManagement Data");
@@ -434,7 +477,7 @@ function amPostDataBuilder (apiRequestType, controllerName, amPostData) {
 * Any error found will removed from the array and sent to another function for logging*/
 
 //This function will inspect the new data and compare it to the data already in BrM to determine if the new data should be a POST or PUT request
-async function updateBrgRdwy(controllerName) {
+async function updateBrgRdwyStrUnit(controllerName) {
     try {
         //First Send a GET Request to the BrM API to fetch the existing data
         const brmResult = await brmGetRequest(controllerName);
@@ -557,7 +600,8 @@ async function updateTable(controllerName) {
             //If updating bridges or roadway, run through checks first
             case "bridges":
             case "roadway":
-                updateBrgRdwy(controllerName);
+            case "structureUnit":
+                updateBrgRdwyStrUnit(controllerName);
                 break;
 
             //If updating Inspections or Element Data, ok to just send the POST request immediately
