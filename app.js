@@ -44,7 +44,7 @@ async function amPostRequest(bodyData) {
     const result =  await amResponse.text();
 
     //If status is 200, alert the user to a successful POST otherwise 
-    if (result.statusCode === 200) {
+    if (amResponse.status === 200) {
         alert("AssetManagment POST Success!")
     } else {
         alert("AssetManagment POST Failure.\n Check console for error log")
