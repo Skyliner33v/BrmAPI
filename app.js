@@ -5,12 +5,38 @@ Functions below will send a GET request to the AssetManagement
 Will then pass that data to a function for either a POST or PUT request and send it to the BrM tables
 Will also send a POST request to a separate table on AssetManagement to record transaction data*/
 
+//Opens a modal overlay during data transfer to prevent multiple repeat button clicks
+function openModal() {
+    document.getElementById('modal').style.display = 'block';
+    document.getElementById('fade').style.display = 'block';
+
+};
+
+//Closes the modal overlay and resets the animation and text
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    document.getElementById('fade').style.display = 'none';
+    document.getElementById('loadSpinner').style.display = 'block';
+    document.getElementById('modalbtnOK').style.display = 'none';
+    document.getElementById('modalText').innerHTML = 'Data Loading...';
+};
+
+/*
+//Generic Sleep function to pause execution when needed.  
+//Call by calling "await sleep(2000);"
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+*/
+
 
 /******** Generic AssetManagment GET Request ***********/
 //Send GET request to Asset Management API and return results
 async function amGetRequest(controllerName) {
 
-    //Setup AssetManagement GET request URL
+    try{
+        //Setup AssetManagement GET request URL
     const amURL = "http://localhost:8081/api/" + controllerName;
 
     //Send GET Request
@@ -20,6 +46,11 @@ async function amGetRequest(controllerName) {
 
     //Return the response
     return await amResponse.json();
+
+    } catch (err) {
+        closeModal()
+        console.error(err)
+    }
 };
 
 
@@ -45,7 +76,12 @@ async function amPostRequest(bodyData) {
 
     //If status is 200, alert the user to a successful POST otherwise 
     if (amResponse.status === 200) {
-        alert("AssetManagment POST Success!")
+        let loadSpinner = document.getElementById("loadSpinner");
+        let modalText = document.getElementById("modalText");
+        let modalBtn = document.getElementById("modalbtnOK");
+        loadSpinner.style.display = "none";
+        modalText.innerHTML = "Successfully transferred "+ bodyData.numRows + " records as a " + bodyData.apiRequestType  + " request to the " + bodyData.tableName.toUpperCase() + " table."
+        modalBtn.style.display = "block";
     } else {
         alert("AssetManagment POST Failure.\n Check console for error log")
         console.error(result.body)
@@ -91,6 +127,7 @@ async function getDB() {
     }
     //Alert if error is encountered
     catch(error) {
+        closeModal()
         alert("Error connecting to the BrM Database.  Try refreshing the page.");
     };
 };
@@ -197,6 +234,7 @@ async function brmGetRequest(controllerName) {
         return await brmResponse.json();
     }
     catch(error) {
+        closeModal()
         console.log("Error sending GET request to " + controllerName);
     };
 }; 
@@ -280,11 +318,12 @@ async function brmPostRequest(controllerName, body) {
                 "error": await brmResponse.json()}
             return Promise.resolve(failedRequest);  
 
-        } Else {
+        } else {
             return Promise.resolve("none");
         };
     }
     catch(error) {
+        closeModal()
         console.log("Error sending POST request to " + controllerName);
     };
 };
@@ -385,6 +424,7 @@ async function brmPutRequest(controllerName, body) {
 
     }
     catch(error) {
+        closeModal()
         console.log("Error sending PUT request to " + controllerName);
     };
 };
@@ -548,6 +588,7 @@ async function updateBrgRdwyStrUnit(controllerName) {
 
     }
     catch(error){
+        closeModal()
         console.log(error);
     };
 };
@@ -595,6 +636,8 @@ async function updateTable(controllerName) {
 
     //Otherwise proceed
     } else {
+
+        openModal()
 
         //Run different checks depending on which controller is selected before inserting data
         switch(controllerName) {
