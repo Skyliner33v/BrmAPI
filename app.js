@@ -558,20 +558,22 @@ function enableNextButton (controllerName) {
 
     switch (controllerName) {
         case "bridges":
+            document.getElementById("importStrUnitBtn").removeAttribute("disabled");
+            break;
+        case "structureUnit":
             document.getElementById("importRoadwayBtn").removeAttribute("disabled");
-            document.getElementById("importBridgesBtn").setAttribute("disabled", true);
             break;
         case "roadway":
             document.getElementById("importInspectionsBtn").removeAttribute("disabled");
-            document.getElementById("importRoadwayBtn").setAttribute("disabled", true);
             break;
         case "inspections":
             document.getElementById("importElemDataBtn").removeAttribute("disabled");
-            document.getElementById("importInspectionsBtn").setAttribute("disabled", true);
             break;
         //If last button is selected, reset the button order.  
         case "elementData":
+            document.getElementById("importBridgesBtn").removeAttribute("disabled");
             document.getElementById("importRoadwayBtn").setAttribute("disabled", true);
+            document.getElementById("importStrUnitBtn").setAttribute("disabled", true);
             document.getElementById("importInspectionsBtn").setAttribute("disabled", true);
             document.getElementById("importElemDataBtn").setAttribute("disabled", true);
             break;
