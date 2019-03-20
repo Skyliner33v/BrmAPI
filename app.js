@@ -202,11 +202,8 @@ function urlBuilderBRM(controllerName) {
         case "inspections":
             restURL =  "Inspection";
             break;
-        case "elementInspection":
+        case "elementData":
             restURL =  "ElementInspection";
-            break;
-        case "elementDefinitions":
-            restURL =  "ElementDefinitions";
             break;
     };
     return baseURL + restURL;
@@ -252,7 +249,7 @@ async function brmPostRequest(controllerName, body) {
     const headers = await headerBuilderBRM();
 
     try {
-        //Send GET Request
+        //Send POST Request
         let brmResponse = await fetch(brmURL, {
             "method": "POST",
             "headers": headers,
@@ -265,45 +262,50 @@ async function brmPostRequest(controllerName, body) {
         if (brmResponse.status === 200 || brmResponse.status === 204) {
 
             switch(controllerName) {
-                case "bridges":
+                case "bridges": {
                     let passedRequest = {
                         "status": "Pass",
                         "BRIDGE_GD": body.BRIDGE_GD,
                         "error" : "none"
                     }
                     return Promise.resolve(passedRequest);
+                }
 
-                case "structureUnit":
+                case "structureUnit": {
                     let passedRequest = {
                         "status": "Pass",
                         "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD,
                         "error" : "none"
                     }
                     return Promise.resolve(passedRequest);
+                }
 
-                case "roadway":
+                case "roadway": {
                     let passedRequest = {
                         "status": "Pass",
                         "ROADWAY_GD": body.ROADWAY_GD,
                         "error" : "none"
                     }
                     return Promise.resolve(passedRequest);
+                }
 
-                case "inspections":
+                case "inspections": {
                     let passedRequest = {
                         "status": "Pass",
                         "INSPEVNT_GD": body.INSPEVNT_GD,
                         "error" : "none"
                     }
                     return Promise.resolve(passedRequest);
+                }
 
-                case "elementData":
+                case "elementData": {
                     let passedRequest = {
                         "status": "Pass",
                         "PON_ELEM_INSP_GD": body.PON_ELEM_INSP_GD,
                         "error" : "none"
                     }
                     return Promise.resolve(passedRequest);
+                }
 
                 default:
                     return Promise.resolve("none");
@@ -315,7 +317,7 @@ async function brmPostRequest(controllerName, body) {
         } else {
 
             switch(controllerName) {
-                case "bridges":
+                case "bridges": {
                     let failedRequest = {
                         "status": "Fail",
                         "BRIDGE_GD": body.BRIDGE_GD, 
@@ -324,8 +326,9 @@ async function brmPostRequest(controllerName, body) {
                         "error": await brmResponse.json()
                     }
                     return Promise.resolve(failedRequest);
+                }
 
-                case "structureUnit":
+                case "structureUnit": {
                     let failedRequest = {
                         "status": "Fail",
                         "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD, 
@@ -333,8 +336,9 @@ async function brmPostRequest(controllerName, body) {
                         "error": await brmResponse.json()
                     }
                     return Promise.resolve(failedRequest);
+                }
 
-                case "roadway":
+                case "roadway": {
                     let failedRequest = {
                         "status": "Fail",
                         "ROADWAY_GD": body.ROADWAY_GD, 
@@ -343,8 +347,9 @@ async function brmPostRequest(controllerName, body) {
                         "error": await brmResponse.json()
                     }
                     return Promise.resolve(failedRequest);
+                }
 
-                case "inspections":
+                case "inspections": {
                     let failedRequest = {
                         "status": "Fail",
                         "INSPEVNT_GD": body.INSPEVNT_GD, 
@@ -354,8 +359,9 @@ async function brmPostRequest(controllerName, body) {
                         "error": await brmResponse.json()
                     }
                     return Promise.resolve(failedRequest);
+                }
 
-                case "elementData":
+                case "elementData": {
                     let failedRequest = {
                         "status": "Fail",
                         "PON_ELEM_INSP_GD": body.PON_ELEM_INSP_GD, 
@@ -365,6 +371,7 @@ async function brmPostRequest(controllerName, body) {
                         "error": await brmResponse.json()
                     }
                     return Promise.resolve(failedRequest);
+                }
 
                 default:
                     return Promise.resolve("none");
