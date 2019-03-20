@@ -263,68 +263,117 @@ async function brmPostRequest(controllerName, body) {
         /**This is necessary because a normal 200 or 204 response returns back no data
         * This way allows for the guid and other data that was updated to be captured and logged**/
         if (brmResponse.status === 200 || brmResponse.status === 204) {
-            if (controllerName ==='bridges') {
-                let passedRequest = {
-                    "status": "Pass",
-                    "BRIDGE_GD": body.BRIDGE_GD,
-                    "error" : "none"
-                }
-                return Promise.resolve(passedRequest);
-            } else if (controllerName = 'roadway') {
-                let passedRequest = {
-                    "status": "Pass",
-                    "ROADWAY_GD": body.ROADWAY_GD,
-                    "error" : "none"
-                }
-                return Promise.resolve(passedRequest);
-            } else if (controllerName = 'structureUnit') {
-                let passedRequest = {
-                    "status": "Pass",
-                    "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD,
-                    "error" : "none"
-                }
-                return Promise.resolve(passedRequest);
-            } else {
-                return Promise.resolve("none");
-            }
+
+            switch(controllerName) {
+                case "bridges":
+                    let passedRequest = {
+                        "status": "Pass",
+                        "BRIDGE_GD": body.BRIDGE_GD,
+                        "error" : "none"
+                    }
+                    return Promise.resolve(passedRequest);
+
+                case "structureUnit":
+                    let passedRequest = {
+                        "status": "Pass",
+                        "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD,
+                        "error" : "none"
+                    }
+                    return Promise.resolve(passedRequest);
+
+                case "roadway":
+                    let passedRequest = {
+                        "status": "Pass",
+                        "ROADWAY_GD": body.ROADWAY_GD,
+                        "error" : "none"
+                    }
+                    return Promise.resolve(passedRequest);
+
+                case "inspections":
+                    let passedRequest = {
+                        "status": "Pass",
+                        "INSPEVNT_GD": body.INSPEVNT_GD,
+                        "error" : "none"
+                    }
+                    return Promise.resolve(passedRequest);
+
+                case "elementData":
+                    let passedRequest = {
+                        "status": "Pass",
+                        "PON_ELEM_INSP_GD": body.PON_ELEM_INSP_GD,
+                        "error" : "none"
+                    }
+                    return Promise.resolve(passedRequest);
+
+                default:
+                    return Promise.resolve("none");
+            };
+
 
         //Handle failed responses to the BRIDGE table
         //Returns promise containing bridge guid and the error message
-        } else if (controllerName = 'bridges') {
-            let failedRequest = {
-                "status": "Fail",
-                "BRIDGE_GD": body.BRIDGE_GD, 
-                "BRIDGE_ID": body.BRIDGE_ID,
-                "STRUCT_NUM": body.STRUCT_NUM,
-                "error": await brmResponse.json()}
-            return Promise.resolve(failedRequest);
-
-        //Handle failed responses to the ROADWAY table
-        //Returns promise containing roadway guid and the error message
-        } else if (controllerName = 'roadway') {
-            let failedRequest = {
-                "status": "Fail",
-                "ROADWAY_GD": body.BRIDGE_GD, 
-                "BRIDGE_GD": body.BRIDGE_GD,
-                "ROADWAY_NAME": body.ROADWAY_NAME,
-                "error": await brmResponse.json()}
-            return Promise.resolve(failedRequest);  
-
-        } else if (controllerName = 'structureUnit') {
-            let failedRequest = {
-                "status": "Fail",
-                "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD, 
-                "BRIDGE_GD": body.BRIDGE_GD,
-                "error": await brmResponse.json()}
-            return Promise.resolve(failedRequest);  
-
         } else {
-            return Promise.resolve("none");
-        };
+
+            switch(controllerName) {
+                case "bridges":
+                    let failedRequest = {
+                        "status": "Fail",
+                        "BRIDGE_GD": body.BRIDGE_GD, 
+                        "BRIDGE_ID": body.BRIDGE_ID,
+                        "STRUCT_NUM": body.STRUCT_NUM,
+                        "error": await brmResponse.json()
+                    }
+                    return Promise.resolve(failedRequest);
+
+                case "structureUnit":
+                    let failedRequest = {
+                        "status": "Fail",
+                        "STRUCTURE_UNIT_GD": body.STRUCTURE_UNIT_GD, 
+                        "BRIDGE_GD": body.BRIDGE_GD,
+                        "error": await brmResponse.json()
+                    }
+                    return Promise.resolve(failedRequest);
+
+                case "roadway":
+                    let failedRequest = {
+                        "status": "Fail",
+                        "ROADWAY_GD": body.ROADWAY_GD, 
+                        "BRIDGE_GD": body.BRIDGE_GD,
+                        "ROADWAY_NAME": body.ROADWAY_NAME,
+                        "error": await brmResponse.json()
+                    }
+                    return Promise.resolve(failedRequest);
+
+                case "inspections":
+                    let failedRequest = {
+                        "status": "Fail",
+                        "INSPEVNT_GD": body.INSPEVNT_GD, 
+                        "BRIDGE_GD": body.BRIDGE_GD,
+                        "INSPKEY": body.INSPKEY,
+                        "INSPDATE": body.INSPDATE,
+                        "error": await brmResponse.json()
+                    }
+                    return Promise.resolve(failedRequest);
+
+                case "elementData":
+                    let failedRequest = {
+                        "status": "Fail",
+                        "PON_ELEM_INSP_GD": body.PON_ELEM_INSP_GD, 
+                        "INSPEVNT_GD": body.INSPEVNT_GD,
+                        "BRIDGE_GD": body.BRIDGE_GD,
+                        "ELEM_KEY": body.ELEM_KEY,
+                        "error": await brmResponse.json()
+                    }
+                    return Promise.resolve(failedRequest);
+
+                default:
+                    return Promise.resolve("none");
+            }
+        }
     }
     catch(error) {
         closeModal()
-        console.log("Error sending POST request to " + controllerName);
+        console.error(error);
     };
 };
 
