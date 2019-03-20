@@ -685,6 +685,7 @@ async function updateTable(controllerName) {
                         amPostRequest(separatedPostResults.passResults);
                     } 
                     if (separatedPostResults.failResults.numRows >= 1) {
+                        amPostRequest(separatedPostResults.failResults);
                         alert("Failed Transfers! Check console."); 
                         console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
                     };
