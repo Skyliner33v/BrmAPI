@@ -21,14 +21,13 @@ function closeModal() {
     document.getElementById('modalText').innerHTML = 'Data Loading...';
 };
 
-/*
+
 //Generic Sleep function to pause execution when needed.  
 //Call by calling "await sleep(2000);"
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-*/
 
 
 /******** Generic AssetManagment GET Request ***********/
@@ -556,6 +555,7 @@ async function updateBrgRdwyStrUnit(controllerName) {
             //Send "fail" data to be logged in transaction history table
             if (separatedPostResults.failResults.numRows >= 1) {
                 amPostRequest(separatedPostResults.failResults);
+                await sleep(200);
                 alert("Failed Transfers! Check console."); 
                 console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
             };
@@ -585,6 +585,7 @@ async function updateBrgRdwyStrUnit(controllerName) {
             //Send "fail" data to be logged in transaction history table
             if (separatedPutResults.failResults.numRows >= 1) {
                 amPostRequest(separatedPutResults.failResults);
+                await sleep(200);
                 alert("Failed Transfers! Check console."); 
                 console.dir(separatedPutResults.tempFailed);
             };
@@ -686,6 +687,7 @@ async function updateTable(controllerName) {
                     } 
                     if (separatedPostResults.failResults.numRows >= 1) {
                         amPostRequest(separatedPostResults.failResults);
+                        await sleep(200);
                         alert("Failed Transfers! Check console."); 
                         console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
                     };
