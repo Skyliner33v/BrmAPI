@@ -74,7 +74,7 @@ async function amPostRequest(bodyData) {
     //Return the response
     const result =  await amResponse.text();
 
-    //If status is 200, alert the user to a successful POST otherwise 
+    //If status is 200, alert the user to a successful POST 
     if (amResponse.status === 200) {
         let loadSpinner = document.getElementById("loadSpinner");
         let modalText = document.getElementById("modalText");
@@ -197,6 +197,9 @@ function urlBuilderBRM(controllerName) {
         case "structureUnit":
             restURL = "StructureUnit";
             break;
+        case "roadway":
+            restURL = "Roadway";
+            break;
         case "inspections":
             restURL =  "Inspection";
             break;
@@ -222,7 +225,6 @@ async function brmGetRequest(controllerName) {
     //Get Headers for BrM Requests
     const headers = await headerBuilderBRM();
 
-    //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
     try {
         //Send GET Request
         let brmResponse = await fetch(brmURL, {
@@ -250,7 +252,6 @@ async function brmPostRequest(controllerName, body) {
     //Get Headers for BrM Requests
     const headers = await headerBuilderBRM();
 
-    //Check if the headers value is correctly formed.  If not, a database was not selected from the list. 
     try {
         //Send GET Request
         let brmResponse = await fetch(brmURL, {
@@ -495,6 +496,7 @@ function amPostDataBuilder (apiRequestType, controllerName, amPostData) {
     let passResults = {
         "tableName": controllerName,
         "apiRequestType": apiRequestType,
+        "status": "PASS",
         "numRows": tempPassed.length,
         "datePosted": datetime
     };
@@ -503,6 +505,7 @@ function amPostDataBuilder (apiRequestType, controllerName, amPostData) {
     let failResults = {
         "tableName": controllerName,
         "apiRequestType": apiRequestType,
+        "status": "FAIL",
         "numRows": tempFailed.length,
         "datePosted": datetime
     };
@@ -546,11 +549,13 @@ async function updateBrgRdwyStrUnit(controllerName) {
             //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
             const separatedPostResults = amPostDataBuilder("POST", controllerName, postResults);
 
-            //If contains data, then send POST requests
+            //Send "pass" data to be logged in transaction history table
             if (separatedPostResults.passResults.numRows >= 1) {
                 amPostRequest(separatedPostResults.passResults);
-            } 
+            }
+            //Send "fail" data to be logged in transaction history table
             if (separatedPostResults.failResults.numRows >= 1) {
+                amPostRequest(separatedPostResults.failResults);
                 alert("Failed Transfers! Check console."); 
                 console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
             };
@@ -573,11 +578,13 @@ async function updateBrgRdwyStrUnit(controllerName) {
             //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
             const separatedPutResults = amPostDataBuilder("PUT", controllerName, putResults);
 
-            //If contains data, then send POST requests
+            //Send "pass" data to be logged in transaction history table
             if (separatedPutResults.passResults.numRows >= 1) {
                 amPostRequest(separatedPutResults.passResults);
             } 
+            //Send "fail" data to be logged in transaction history table
             if (separatedPutResults.failResults.numRows >= 1) {
+                amPostRequest(separatedPutResults.failResults);
                 alert("Failed Transfers! Check console."); 
                 console.dir(separatedPutResults.tempFailed);
             };
