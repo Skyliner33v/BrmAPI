@@ -1,25 +1,63 @@
-
 /*Update tables in BrM using the AssetManagement Tables
 New data will be posted to the AssetManagement Tables
 Functions below will send a GET request to the AssetManagement
 Will then pass that data to a function for either a POST or PUT request and send it to the BrM tables
 Will also send a POST request to a separate table on AssetManagement to record transaction data*/
 
+//Instatiate global variable to hold auth token
+var authToken = "";
+
+//Instatiate a global counter for tracking dom updates after each button selection
+var reqCount = 0;
+
 //Opens a modal overlay during data transfer to prevent multiple repeat button clicks
 function openModal() {
     document.getElementById('modal').style.display = 'block';
     document.getElementById('fade').style.display = 'block';
-
 };
 
-//Closes the modal overlay and resets the animation and text
+
+//Closes the modal overlay and resets the animation and text display
 function closeModal() {
+
+    //Reset elements
     document.getElementById('modal').style.display = 'none';
     document.getElementById('fade').style.display = 'none';
     document.getElementById('loadSpinner').style.display = 'block';
     document.getElementById('modalbtnOK').style.display = 'none';
-    document.getElementById('modalText').innerHTML = 'Data Loading...';
+    document.getElementById('modalText0').innerHTML = 'Data Loading...';
+
 };
+
+
+function updateRequestText(bodyData) {
+
+    //Add New Line to the page to show transaction
+    var para = document.createElement("p");
+
+    if (bodyData.status === "PASS") {
+        para.innerHTML = "Successfully transferred "+ bodyData.numRows + " records as a " + bodyData.apiRequestType  + " request to the " + bodyData.tableName.toUpperCase() + " table."
+        document.getElementById("updateResponse").appendChild(para);
+    } else if (bodyData.status === "FAIL") {
+        para.innerHTML = "Failed to transfer "+ bodyData.numRows + " records as a " + bodyData.apiRequestType  + " request to the " + bodyData.tableName.toUpperCase() + " table.  Check the console for the error log."
+        document.getElementById("updateResponse").appendChild(para);
+    } else {
+        para.innerHTML = "Error sending Transaction Data to the Asset Management database."
+        document.getElementById("updateResponse").appendChild(para);
+    }
+    
+
+    //Decrement the request counter by one
+    reqCount--
+
+    //Show the OK button to close the modal after all text has been rendered to the screen
+    if (reqCount === 0) {
+        document.getElementById("loadSpinner").style.display = "none";
+        document.getElementById('modalText0').innerHTML = 'Data Transfer Complete';
+        document.getElementById("modalbtnOK").style.display = "block";
+    }
+};
+
 
 
 //Generic Sleep function to pause execution when needed.  
@@ -57,35 +95,37 @@ async function amGetRequest(controllerName) {
 //Send POST request to Asset Management API and return results
 async function amPostRequest(bodyData) {
 
-    //Setup AssetManagement POST request URL
-    const amURL = "http://localhost:8081/api/transactions"
+    try {
+        //Setup AssetManagement POST request URL
+        const amURL = "http://localhost:8081/api/transactions"
 
-    //Send POST Request
-    const amResponse = await fetch(amURL, {
-        "method": "POST",
-        "headers": {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },        
-        "body": JSON.stringify(bodyData)
-    });
+        //Send POST Request
+        const amResponse = await fetch(amURL, {
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },        
+            "body": JSON.stringify(bodyData)
+        });
 
-    //Return the response
-    const result =  await amResponse.text();
+        //Process the response
+        const result =  await amResponse.text();
 
-    //If status is 200, alert the user to a successful POST 
-    if (amResponse.status === 200) {
-        let loadSpinner = document.getElementById("loadSpinner");
-        let modalText = document.getElementById("modalText");
-        let modalBtn = document.getElementById("modalbtnOK");
-        loadSpinner.style.display = "none";
-        modalText.innerHTML = "Successfully transferred "+ bodyData.numRows + " records as a " + bodyData.apiRequestType  + " request to the " + bodyData.tableName.toUpperCase() + " table."
-        modalBtn.style.display = "block";
-    } else {
-        alert("AssetManagment POST Failure.\n Check console for error log")
-        console.error(result.body)
+        if (amResponse.status === 200) {
+
+            //Update screen with transaction info
+            updateRequestText(bodyData);
+            return "Passed";
+
+        } else {
+            return "Failed";
+        }
+    } 
+
+    catch (error) {
+        console.error(error);
     }
-        
 };
 
 
@@ -131,8 +171,6 @@ async function getDB() {
     };
 };
 
-//Get list of Databases on page load to be used for the Authorization Request
-getDB();
 
 //Simple function to return database ID value
 function getDbValue() {
@@ -144,34 +182,46 @@ function getDbValue() {
 
 //Request authorization token
 async function getAuth() {
-    
+
     //Get database value
     const dbValue = getDbValue();
 
-    //Setup request url and header info
-    const authURL = "http://localhost:9000/api/auth/APILogin";
-    const headers = {
-        "Accept": "application/JSON",
-        "Authorization": "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
-        "database_id": "'" + dbValue + "'"
+    //If dbValue is empty, alert the user, otherwise get the token
+    if (dbValue === "default") {
+        alert("Database is no longer selected.  API token is no longer valid")
+
+    } else {
+        //Setup request url and header info
+        const authURL = "http://localhost:9000/api/auth/APILogin";
+        const headers = {
+            "Accept": "application/JSON",
+            "Authorization": "Basic cG9udGlzOnBvbnRpcw==", //Base64 encoding of the string "pontis:pontis"
+            "database_id": "'" + dbValue + "'"
+        };
+
+        //Set Get Request
+        let response = await fetch(authURL, {
+            method: "GET",
+            headers: headers
+        });
+
+        //Process response from the request and set the authorization token to the global var
+        let result = await response.json();
+        authToken = result.auth_token;
+
+        //Get another auth token after 19 minutes.  Default timeout of auth token expires in 20 min
+        setTimeout(getAuth, 19*60*1000);
     };
-
-    //Set Get Request
-    let response = await fetch(authURL, {
-        method: "GET",
-        headers: headers
-    });
-
-    //Process response from the request and return the authorization token
-    let result = await response.json();
-    return result.auth_token;
 };
+
+
+//Get list of Databases on page load
+window.onload = getDB();
 
 
 //Create headers to be used in any BrM Request
 async function headerBuilderBRM() {
-    //Get authorization token //Add this to the header instead
-    const authToken = await getAuth();
+    //Get authorization token 
     let headers = {
         "Accept": "application/JSON",
         "content-type": "application/JSON",
@@ -259,7 +309,7 @@ async function brmPostRequest(controllerName, body) {
         //If return status is ok, return a promise of the guid of the record that was updated
         /**This is necessary because a normal 200 or 204 response returns back no data
         * This way allows for the guid and other data that was updated to be captured and logged**/
-        if (brmResponse.status === 200 || brmResponse.status === 204) {
+        if (brmResponse.status === 200 || brmResponse.status === 204 || brmResponse.status === 222) {
 
             switch(controllerName) {
                 case "bridges": {
@@ -490,41 +540,40 @@ async function brmPutRequest(controllerName, body) {
 //Compare data in Brm and AssetManagement Tables
 function compareData(controllerName, brmData, amData) {
 
-        //Evaluate which controller first
-        if(controllerName == "bridges") {
-            //Create list of matching bridges to be used as a PUT request
-            var putData = amData.filter(amGuid => 
-                brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
+    //Evaluate which controller first
+    if(controllerName == "bridges") {
+        //Create list of matching bridges to be used as a PUT request
+        var putData = amData.filter(amGuid => 
+            brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
 
-            //Create list of non-matching bridges to be used as a POST request
-            var postData = amData.filter(amGuid => 
-                !brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
-        } 
-        else if (controllerName == "roadway") {
-            //Create list of matching roadways to be used as a PUT request
-            var putData = amData.filter(amGuid => 
-                brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
+        //Create list of non-matching bridges to be used as a POST request
+        var postData = amData.filter(amGuid => 
+            !brmData.some(bmGuid => (bmGuid.BRIDGE_GD === amGuid.BRIDGE_GD)));
+    } 
+    else if (controllerName == "roadway") {
+        //Create list of matching roadways to be used as a PUT request
+        var putData = amData.filter(amGuid => 
+            brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
 
-            //Create list of non-matching roadways to be used as a POST request
-            var postData = amData.filter(amGuid => 
-                !brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
-        }
-        else if (controllerName == "structureUnit") {
-            //Create list of matching roadways to be used as a PUT request
-            var putData = amData.filter(amGuid => 
-                brmData.some(bmGuid => (bmGuid.STRUCTURE_UNIT_GD === amGuid.STRUCTURE_UNIT_GD)));
+        //Create list of non-matching roadways to be used as a POST request
+        var postData = amData.filter(amGuid => 
+            !brmData.some(bmGuid => (bmGuid.ROADWAY_GD === amGuid.ROADWAY_GD)));
+    }
+    else if (controllerName == "structureUnit") {
+        //Create list of matching roadways to be used as a PUT request
+        var putData = amData.filter(amGuid => 
+            brmData.some(bmGuid => (bmGuid.STRUCTURE_UNIT_GD === amGuid.STRUCTURE_UNIT_GD)));
 
-            //Create list of non-matching roadways to be used as a POST request
-            var postData = amData.filter(amGuid => 
-                !brmData.some(bmGuid => (bmGuid.STRUCTURE_UNIT_GD === amGuid.STRUCTURE_UNIT_GD)));
-        }
-        else {
-            alert("Error comparing BrM and AssetManagement Data");
-        }; 
+        //Create list of non-matching roadways to be used as a POST request
+        var postData = amData.filter(amGuid => 
+            !brmData.some(bmGuid => (bmGuid.STRUCTURE_UNIT_GD === amGuid.STRUCTURE_UNIT_GD)));
+    }
+    else {
+        alert("Error comparing BrM and AssetManagement Data");
+    }; 
 
     //Return the separated data as an object
     return {postData, putData};
-
 };
 
 
@@ -566,7 +615,7 @@ function amPostDataBuilder (apiRequestType, controllerName, amPostData) {
     };
 
     return {passResults, failResults, tempPassed, tempFailed};
-}
+};
 
 
 /******** Inpsect and separate the new data before updating the BRIDGE or ROADWAY tables in BrM ***********/
@@ -590,6 +639,9 @@ async function updateBrgRdwyStrUnit(controllerName) {
         //Send POST request for new Data to be added to the database
         if (Object.keys(separatedValues.postData).length >= 1) {
 
+            //Automaticall increment request counter by 2 and decrement it if no transactions to insert
+            reqCount += 2;
+
             //Initialize array to hold promises before resolving
             let promiseArray = [];
 
@@ -604,21 +656,33 @@ async function updateBrgRdwyStrUnit(controllerName) {
             //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
             const separatedPostResults = amPostDataBuilder("POST", controllerName, postResults);
 
-            //Send "pass" data to be logged in transaction history table
+            //Send "PASS" data to be logged in transaction history table
             if (separatedPostResults.passResults.numRows >= 1) {
+
+                //Send a POST request back to the AsssetManagement table for logging the transaction
                 amPostRequest(separatedPostResults.passResults);
+            } else {
+                //Decrement the counter if there are no transaction to insert
+                reqCount--;
             }
-            //Send "fail" data to be logged in transaction history table
+
+            //Send "FAIL" data to be logged in transaction history table and display failed records in the console (for now)
             if (separatedPostResults.failResults.numRows >= 1) {
+
+                //Send a POST request back to the AsssetManagement table for logging the transaction
                 amPostRequest(separatedPostResults.failResults);
-                await sleep(200);
-                alert("Failed Transfers! Check console."); 
-                console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
+                console.dir(separatedPostResults.tempFailed); //need to process this further to another database or log file maybe?
+            } else {
+                //Decrement the counter if there are no transaction to insert
+                reqCount--;
             };
         };
 
         //Send PUT request for new Data to update the existing records in the database
         if (Object.keys(separatedValues.putData).length >= 1) {
+            
+            //Automaticall increment request counter by 2 and decrement it if no transactions to insert
+            reqCount += 2;
 
             //Initialize array to hold promises before resolving
             let promiseArray = [];
@@ -636,14 +700,24 @@ async function updateBrgRdwyStrUnit(controllerName) {
 
             //Send "pass" data to be logged in transaction history table
             if (separatedPutResults.passResults.numRows >= 1) {
+
+                //Send a POST request back to the AsssetManagement table for logging the transaction
                 amPostRequest(separatedPutResults.passResults);
-            } 
-            //Send "fail" data to be logged in transaction history table
+            } else {
+                //Decrement the counter if there are no transaction to insert
+                reqCount--;
+            };
+
+            //Send "fail" data to be logged in transaction history table and display failed records in the console (for now)
             if (separatedPutResults.failResults.numRows >= 1) {
+
+                //Send a POST request back to the AsssetManagement table for logging the transaction
                 amPostRequest(separatedPutResults.failResults);
-                await sleep(200);
-                alert("Failed Transfers! Check console."); 
-                console.dir(separatedPutResults.tempFailed);
+                console.dir(separatedPutResults.tempFailed); //need to process this further to another database or log file maybe?
+                
+            } else {
+                //Decrement the counter if there are no transaction to insert
+                reqCount--;
             };
         };
 
@@ -683,8 +757,7 @@ function enableNextButton (controllerName) {
             document.getElementById("importElemDataBtn").setAttribute("disabled", true);
             break;
     };
-
-}
+};
 
 
 /******** Update BrM Tables with AssetManagement Data ***********/
@@ -698,10 +771,7 @@ async function updateTable(controllerName) {
     if (dropdownValue === 'default') {
         alert ("Select a database first")
 
-    //Otherwise proceed
     } else {
-
-        openModal()
 
         //Run different checks depending on which controller is selected before inserting data
         switch(controllerName) {
@@ -710,6 +780,10 @@ async function updateTable(controllerName) {
             case "bridges":
             case "roadway":
             case "structureUnit":
+                //Open the overlay screen to prevent unwanted button presses
+                openModal()
+
+                //Run checking function
                 updateBrgRdwyStrUnit(controllerName);
                 break;
 
@@ -722,6 +796,12 @@ async function updateTable(controllerName) {
 
                 //If there is new data, send POST requests for new data to be added to the database
                 if (Object.keys(amResult).length >= 1) {
+
+                    //Open the overlay screen to prevent unwanted button presses
+                    openModal()
+
+                    //Automaticall increment request counter by 2 and decrement it if no transactions to insert
+                    reqCount += 2;
 
                     //Initialize array to hold promises before resolving
                     let promiseArray = [];
@@ -739,29 +819,31 @@ async function updateTable(controllerName) {
 
                     //If contains data, then send POST requests
                     if (separatedPostResults.passResults.numRows >= 1) {
+
+                        //Send a POST request back to the AsssetManagement table for logging the transaction
                         amPostRequest(separatedPostResults.passResults);
-                    } 
-                    if (separatedPostResults.failResults.numRows >= 1) {
-                        amPostRequest(separatedPostResults.failResults);
-                        await sleep(200);
-                        alert("Failed Transfers! Check console."); 
-                        console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
+                    } else {
+                        //Decrement the counter if there are no transaction to insert
+                        reqCount--;
                     };
+
+                    if (separatedPostResults.failResults.numRows >= 1) {
+
+                        //Send a POST request back to the AsssetManagement table for logging the transaction
+                        amPostRequest(separatedPostResults.failResults);
+                        console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
+                    } else {
+                        //Decrement the counter if there are no transaction to insert
+                        reqCount--;
+                    };;
+
                 } else if (Object.keys(amResult).length === 0) {
                     alert("No new records to insert")
                 }
 
+                //Enable next available button
+                enableNextButton(controllerName);  
                 break;
         };
     };
 };
-
-
-
-
-
-
-
-
-
-

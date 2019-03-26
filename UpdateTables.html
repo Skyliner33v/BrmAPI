@@ -26,7 +26,7 @@
             <h2>Select a BrM Database to Update</h2>
         </header>
         <div id="dbDropdownDiv">
-            <select id="dbDropdown" name="dbSelect"></select>
+            <select id="dbDropdown" name="dbSelect" onchange="getAuth()"></select>
         </div>
     </div>
 
@@ -49,7 +49,7 @@
             </nav>
 
             <article id="updateArticle">
-                <pre id="updateResponse"></p>
+                <pre id="updateResponse"></pre>
             </article>
         </section>
     </div>
@@ -57,7 +57,7 @@
     <div id="fade"></div>
     <div id="modal">
         <div id="loadSpinner" class="loader"></div>
-        <p id="modalText">Data Loading...</p>
+        <p id="modalText0">Data Loading...</p>
         <button id="modalbtnOK" type="button" onclick="closeModal()">OK</button>
     </div>
 
