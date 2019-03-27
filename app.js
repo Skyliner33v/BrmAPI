@@ -309,7 +309,7 @@ async function brmPostRequest(controllerName, body) {
         //If return status is ok, return a promise of the guid of the record that was updated
         /**This is necessary because a normal 200 or 204 response returns back no data
         * This way allows for the guid and other data that was updated to be captured and logged**/
-        if (brmResponse.status === 200 || brmResponse.status === 204 || brmResponse.status === 222) {
+        if (brmResponse.status === 200 || brmResponse.status === 204) {
 
             switch(controllerName) {
                 case "bridges": {
