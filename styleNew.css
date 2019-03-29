@@ -19,6 +19,8 @@ section {
 
 /* Style the navigation menu */
 nav {
+    display: flex;
+    flex-direction: column;
     background: #ccc;
     padding: 5px 5px 20px 5px;
     text-align: center;
@@ -45,6 +47,21 @@ header {
     color: white;
 }
 
+.subHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#importToggle {
+    position: absolute;
+    left: 15px;
+}
+
+#updateNavHeader {
+    align-content: center;
+}
+
 #dbDropdownDiv {
     min-height: 50px;
     text-align: center;
@@ -54,6 +71,14 @@ header {
     padding: 2px;
     margin: 12px;
     font-size: 16px;
+}
+
+#importButtons {
+    display: block;
+}
+
+#importAllButton {
+    display: none;
 }
 
 button {
@@ -173,3 +198,50 @@ th {
 }
 
 
+.toggle {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100px;
+    height: 32px;
+    display: inline-block;
+    position: relative;
+    border-radius: 50px;
+    overflow: hidden;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(62, 142, 65);
+    transition: background-color ease 0.3s;
+}
+
+.toggle:before {
+    content: "all  each";
+    display: block;
+    position: absolute;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    background: #fff;
+    left: 2px;
+    top: 2px;
+    border-radius: 50%;
+    font: 12px/28px Helvetica;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-indent: -26px;
+    word-spacing: 37px;
+    color: #fff;
+    text-shadow: -1px -1px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all cubic-bezier(0.3, 1.5, 0.7, 1) 0.3s;
+}
+
+.toggle:checked {
+    background-color: rgb(67, 204, 21);
+}
+
+.toggle:checked:before {
+    left: 70px;
+}

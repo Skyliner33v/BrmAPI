@@ -19,15 +19,30 @@ function openModal() {
 
 //Closes the modal overlay and resets the animation and text display
 function closeModal() {
-
     //Reset elements
     document.getElementById('modal').style.display = 'none';
     document.getElementById('fade').style.display = 'none';
     document.getElementById('loadSpinner').style.display = 'block';
     document.getElementById('modalbtnOK').style.display = 'none';
     document.getElementById('modalText0').innerHTML = 'Data Loading...';
-
 };
+
+
+
+//EventListener for Toggle button
+//Toggles All button, or individual buttons
+var toggle = document.getElementById('importToggle');
+toggle.addEventListener('click', function() {
+    var importButtons = document.getElementById('importButtons');
+    var importAllButtons = document.getElementById('importAllButton');
+    if (toggle.checked) {
+        importButtons.style.display = 'none';
+        importAllButtons.style.display = 'block'
+    } else {
+        importButtons.style.display = 'block';
+        importAllButtons.style.display = 'none';
+    }
+});
 
 
 function updateRequestText(bodyData) {
@@ -180,6 +195,12 @@ function getDbValue() {
 };
 
 
+
+//Get list of Databases on page load
+window.onload = getDB();
+
+
+
 //Request authorization token
 async function getAuth() {
 
@@ -214,9 +235,6 @@ async function getAuth() {
     };
 };
 
-
-//Get list of Databases on page load
-window.onload = getDB();
 
 
 //Create headers to be used in any BrM Request
@@ -660,7 +678,7 @@ async function updateBrgRdwyStrUnit(controllerName) {
             if (separatedPostResults.passResults.numRows >= 1) {
 
                 //Send a POST request back to the AsssetManagement table for logging the transaction
-                amPostRequest(separatedPostResults.passResults);
+                await amPostRequest(separatedPostResults.passResults);
             } else {
                 //Decrement the counter if there are no transaction to insert
                 reqCount--;
@@ -670,7 +688,7 @@ async function updateBrgRdwyStrUnit(controllerName) {
             if (separatedPostResults.failResults.numRows >= 1) {
 
                 //Send a POST request back to the AsssetManagement table for logging the transaction
-                amPostRequest(separatedPostResults.failResults);
+                await amPostRequest(separatedPostResults.failResults);
                 console.dir(separatedPostResults.tempFailed); //need to process this further to another database or log file maybe?
             } else {
                 //Decrement the counter if there are no transaction to insert
@@ -702,7 +720,7 @@ async function updateBrgRdwyStrUnit(controllerName) {
             if (separatedPutResults.passResults.numRows >= 1) {
 
                 //Send a POST request back to the AsssetManagement table for logging the transaction
-                amPostRequest(separatedPutResults.passResults);
+                await amPostRequest(separatedPutResults.passResults);
             } else {
                 //Decrement the counter if there are no transaction to insert
                 reqCount--;
@@ -712,7 +730,7 @@ async function updateBrgRdwyStrUnit(controllerName) {
             if (separatedPutResults.failResults.numRows >= 1) {
 
                 //Send a POST request back to the AsssetManagement table for logging the transaction
-                amPostRequest(separatedPutResults.failResults);
+                await amPostRequest(separatedPutResults.failResults);
                 console.dir(separatedPutResults.tempFailed); //need to process this further to another database or log file maybe?
                 
             } else {
@@ -784,8 +802,8 @@ async function updateTable(controllerName) {
                 openModal()
 
                 //Run checking function
-                updateBrgRdwyStrUnit(controllerName);
-                break;
+                await updateBrgRdwyStrUnit(controllerName);
+                return ;
 
             //If updating Inspections or Element Data, ok to just send the POST request immediately
             case "inspections":
@@ -815,13 +833,13 @@ async function updateTable(controllerName) {
                     var postResults = await Promise.all(promiseArray); 
 
                     //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
-                    const separatedPostResults = amPostDataBuilder("POST", controllerName, postResults);
+                    const separatedPostResults = await amPostDataBuilder("POST", controllerName, postResults);
 
                     //If contains data, then send POST requests
                     if (separatedPostResults.passResults.numRows >= 1) {
 
                         //Send a POST request back to the AsssetManagement table for logging the transaction
-                        amPostRequest(separatedPostResults.passResults);
+                        await amPostRequest(separatedPostResults.passResults);
                     } else {
                         //Decrement the counter if there are no transaction to insert
                         reqCount--;
@@ -830,12 +848,12 @@ async function updateTable(controllerName) {
                     if (separatedPostResults.failResults.numRows >= 1) {
 
                         //Send a POST request back to the AsssetManagement table for logging the transaction
-                        amPostRequest(separatedPostResults.failResults);
+                        await amPostRequest(separatedPostResults.failResults);
                         console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
                     } else {
                         //Decrement the counter if there are no transaction to insert
                         reqCount--;
-                    };;
+                    };
 
                 } else if (Object.keys(amResult).length === 0) {
                     alert("No new records to insert")
@@ -843,7 +861,7 @@ async function updateTable(controllerName) {
 
                 //Enable next available button
                 enableNextButton(controllerName);  
-                break;
+                return "";
         };
     };
 };
