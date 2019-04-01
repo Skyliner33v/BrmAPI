@@ -803,7 +803,7 @@ async function updateTable(controllerName) {
 
                 //Run checking function
                 await updateBrgRdwyStrUnit(controllerName);
-                return ;
+                break;
 
             //If updating Inspections or Element Data, ok to just send the POST request immediately
             case "inspections":
@@ -861,7 +861,14 @@ async function updateTable(controllerName) {
 
                 //Enable next available button
                 enableNextButton(controllerName);  
-                return "";
+                break;
         };
     };
+};
+
+async function updateAllTables() {
+    let controllerArray = ['bridges', 'structureUnit', 'roadway', 'inspections', 'elementData'];
+    for (let controller of controllerArray) {
+        await updateTable(controller);
+    }
 };
