@@ -680,24 +680,25 @@ async function updateBrgRdwyStrUnit(controllerName) {
             const separatedPostResults = amPostDataBuilder("POST", controllerName, postResults);
 
             //Send "PASS" data to be logged in transaction history table
-            if (separatedPostResults.passResults.numRows >= 1) {
-
-                //Send a POST request back to the AsssetManagement table for logging the transaction
-                await amPostRequest(separatedPostResults.passResults);
-            } else {
+            if (separatedPostResults.passResults.numRows === 0) {
                 //Decrement the counter if there are no transaction to insert
                 reqCount--;
+                checkCounter();    
+            } else {
+                //Send a POST request back to the AsssetManagement table for logging the transaction
+                await amPostRequest(separatedPostResults.passResults);
             }
 
             //Send "FAIL" data to be logged in transaction history table and display failed records in the console (for now)
-            if (separatedPostResults.failResults.numRows >= 1) {
-
+            if (separatedPostResults.failResults.numRows === 0) {
+                //Decrement the counter if there are no transaction to insert
+                reqCount--;
+                checkCounter();
+            } else {
                 //Send a POST request back to the AsssetManagement table for logging the transaction
                 await amPostRequest(separatedPostResults.failResults);
                 console.dir(separatedPostResults.tempFailed); //need to process this further to another database or log file maybe?
-            } else {
-                //Decrement the counter if there are no transaction to insert
-                reqCount--;
+            
             };
         };
 
