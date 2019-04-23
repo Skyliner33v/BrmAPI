@@ -64,6 +64,11 @@ function updateRequestText(bodyData) {
 
     //Decrement the request counter by one
     reqCount--
+    checkCounter();
+
+};
+
+function checkCounter() {
 
     //Show the OK button to close the modal after all text has been rendered to the screen
     if (reqCount === 0) {
@@ -717,25 +722,25 @@ async function updateBrgRdwyStrUnit(controllerName) {
             const separatedPutResults = amPostDataBuilder("PUT", controllerName, putResults);
 
             //Send "pass" data to be logged in transaction history table
-            if (separatedPutResults.passResults.numRows >= 1) {
-
-                //Send a POST request back to the AsssetManagement table for logging the transaction
-                await amPostRequest(separatedPutResults.passResults);
-            } else {
+            if (separatedPutResults.passResults.numRows === 0) {
                 //Decrement the counter if there are no transaction to insert
                 reqCount--;
+                checkCounter();
+            } else {
+                //Send a POST request back to the AsssetManagement table for logging the transaction
+                await amPostRequest(separatedPutResults.passResults);
             };
 
             //Send "fail" data to be logged in transaction history table and display failed records in the console (for now)
-            if (separatedPutResults.failResults.numRows >= 1) {
-
+            if (separatedPutResults.failResults.numRows === 0) {
+                //Decrement the counter if there are no transaction to insert
+                reqCount--;
+                checkCounter();
+            } else {
                 //Send a POST request back to the AsssetManagement table for logging the transaction
                 await amPostRequest(separatedPutResults.failResults);
                 console.dir(separatedPutResults.tempFailed); //need to process this further to another database or log file maybe?
                 
-            } else {
-                //Decrement the counter if there are no transaction to insert
-                reqCount--;
             };
         };
 
@@ -836,23 +841,23 @@ async function updateTable(controllerName) {
                     const separatedPostResults = await amPostDataBuilder("POST", controllerName, postResults);
 
                     //If contains data, then send POST requests
-                    if (separatedPostResults.passResults.numRows >= 1) {
-
-                        //Send a POST request back to the AsssetManagement table for logging the transaction
-                        await amPostRequest(separatedPostResults.passResults);
-                    } else {
+                    if (separatedPostResults.passResults.numRows === 0) {
                         //Decrement the counter if there are no transaction to insert
                         reqCount--;
+                        checkCounter();
+                    } else {
+                        //Send a POST request back to the AsssetManagement table for logging the transaction
+                        await amPostRequest(separatedPostResults.passResults);
                     };
 
-                    if (separatedPostResults.failResults.numRows >= 1) {
-
+                    if (separatedPostResults.failResults.numRows === 0) {
+                        //Decrement the counter if there are no transaction to insert
+                        reqCount--;
+                        checkCounter();
+                    } else {
                         //Send a POST request back to the AsssetManagement table for logging the transaction
                         await amPostRequest(separatedPostResults.failResults);
                         console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
-                    } else {
-                        //Decrement the counter if there are no transaction to insert
-                        reqCount--;
                     };
 
                 } else if (Object.keys(amResult).length === 0) {
