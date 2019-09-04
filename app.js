@@ -451,6 +451,7 @@ async function brmPostRequest(controllerName, body) {
                     return Promise.resolve("none");
             }
         }
+    }
     catch(error) {
         closeModal()
         console.error(error);

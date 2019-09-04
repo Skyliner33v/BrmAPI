@@ -61,13 +61,24 @@
     </div>
 
     <!--Graphing Playground section-->
-    <div id="graphsDiv" class="cards">
+    <div id="graphsDivMain" class="cards">
         <header id="graphsHeader">
             <h2>API Graphs Showcase</h2>
         </header>
 
         <section id="graphsSection">
-            
+            <div id="graphsDiv">
+                <div id="barChartDiv">
+                    <button id="barChartBtn" type="button" onClick="showBarChart()">Good/Fair/Poor Bar Chart</button>
+                    <div id="barChart">
+                    </div>
+                </div>
+                <div id="pieChartDiv">
+                    <button id="pieChartBtn" type="button" onClick="showPieChart()">Pie Chart</button>
+                    <div id="pieChart">
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
 
