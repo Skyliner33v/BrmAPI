@@ -11,8 +11,8 @@ body {
 /* Container for flexboxes */
 section {
     display: flex;
-    min-height: 550px;
-    max-height: 550px;
+    min-height: 400px;
+    max-height: 400px;
     align-items: top;
     flex-direction: column;
 }
