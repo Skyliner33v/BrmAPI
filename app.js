@@ -279,6 +279,9 @@ function urlBuilderBRM(controllerName) {
         case "elementData":
             restURL =  "ElementInspection";
             break;
+        case "Inspection":
+            restURL = "Inspection";
+            break;
     };
     return baseURL + restURL;
 };
@@ -930,4 +933,37 @@ async function updateAllTables() {
     for (let controller of controllerArray) {
         await updateTable(controller);
     }
+};
+
+
+
+
+/******** Plotly Graph Section ***********/
+
+/*
+//Create generic Group By function
+//https://gist.github.com/JamieMason/0566f8412af9fe6a1d470aa1e089a752
+//Note: Unused, as of now
+
+//Setup method
+const groupBy = key => array =>
+    array.reduce((objectsByKeyValue, obj) => {
+        const value = obj[key];
+        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+        return objectsByKeyValue;
+    }, {});
+
+//Usage
+const groupByBridge = groupBy('BRIDGE_GD')
+const inspectionsByBridge = groupByBridge(inspevntData);
+console.log(inspectionsByBridge);
+*/
+
+//Display Bar Chart for Good Fair Poor Condition Bridges
+async function showBarChart() {
+    const inspevntData = await brmGetRequest('Inspection');
+
+    const filteredInspections = inspevntData.filter(inspection => inspection.NBINSPDONE == 0);
+
+
 };
