@@ -4,6 +4,7 @@ Functions below will send a GET request to the AssetManagement
 Will then pass that data to a function for either a POST or PUT request and send it to the BrM tables
 Will also send a POST request to a separate table on AssetManagement to record transaction data*/
 
+
 //Instatiate global variable to hold auth token
 var authToken = "";
 
@@ -450,7 +451,6 @@ async function brmPostRequest(controllerName, body) {
                     return Promise.resolve("none");
             }
         }
-    }
     catch(error) {
         closeModal()
         console.error(error);
@@ -827,7 +827,9 @@ async function updateTable(controllerName) {
                     //Automaticall increment request counter by 2 and decrement it if no transactions to insert
                     reqCount += 2;
 
-                    //Initialize array to hold promises before resolving
+
+//V1.0
+/*                     //Initialize array to hold promises before resolving
                     let promiseArray = [];
 
                     //Loop through each record and send as a POST request.  Returns an array of promises that need to be resolved
@@ -837,8 +839,56 @@ async function updateTable(controllerName) {
 
                     //Resolve promise Array to a new variable for future processing
                     var postResults = await Promise.all(promiseArray); 
+*/
 
-                    //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
+/*
+//V2.0
+                    const numPasses = Math.ceil(amResult.length / 1000);
+
+                    for (let i=0; i <= numPasses; i++) {
+                        let subset = amResult.splice(0,1000);
+                        let promises = subset.map(async (record) => {
+                            await brmPostRequest(controllerName, record);
+                        });
+
+                        await Promise.all(promises);
+
+                        subset.length = 0;
+
+
+                    };
+*/
+
+/*
+//V3.0
+                    const postResults = Promise.map(amResult, async data => {
+                        await brmPostRequest(controllerName, data);
+                        return Promise.resolve();
+                    }, {concurrency: 100});
+*/
+
+//V4.0
+/*                    const amResult = await amGetRequest(controllerName);
+                    let counts = { 'successes': 0, 'errors': 0 };
+                    for (let i = 0; i < amResult.length; i++) {
+                        try {
+                            await brmPostRequest(controllerName, amResult[i]);
+                            counts.successes += 1;
+                        } catch(err) {
+                            counts.errors += 1;
+                        }
+                    };
+                    console.log(counts);
+*/
+
+//V5.0
+                    await Promise.all(amResult.map(async (record) => {
+                        const postResults = await brmPostRequest(controllerName, record);
+                    }));
+
+
+
+/*                    //Build separate lists for passed and failed post requests.  Will be sent to the database for tracking purposes
                     const separatedPostResults = await amPostDataBuilder("POST", controllerName, postResults);
 
                     //If contains data, then send POST requests
@@ -860,6 +910,7 @@ async function updateTable(controllerName) {
                         await amPostRequest(separatedPostResults.failResults);
                         console.dir(separatedPostResults.tempFailed); //need to process this further to another database maybe?
                     };
+*/
 
                 } else if (Object.keys(amResult).length === 0) {
                     alert("No new records to insert")
@@ -871,6 +922,7 @@ async function updateTable(controllerName) {
         };
     };
 };
+
 
 async function updateAllTables() {
     let controllerArray = ['bridges', 'structureUnit', 'roadway', 'inspections', 'elementData'];
