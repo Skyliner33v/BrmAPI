@@ -959,11 +959,55 @@ const inspectionsByBridge = groupByBridge(inspevntData);
 console.log(inspectionsByBridge);
 */
 
-//Display Bar Chart for Good Fair Poor Condition Bridges
+
+//Display Bar Chart for Bridges by District
 async function showBarChart() {
-    const inspevntData = await brmGetRequest('Inspection');
 
-    const filteredInspections = inspevntData.filter(inspection => inspection.NBINSPDONE == 0);
+    //Send GET request to collect Bridge Data
+    const bridgeData = await brmGetRequest('bridges');
 
+    //Set up containers for bar chart data
+    let xData = ['District 1', 'District 2', 'District 3', 'District 4', 'District 5', 'District 6', 'Unknown'];
+    let yData = [0,0,0,0,0,0,0]
 
+    //Count the number of Bridges by District and add to barChartData
+    for (let row of bridgeData) {
+        if (row.DISTRICT == '01') {
+            yData[0] += 1
+        } else if (row.DISTRICT == '02') {
+            yData[1] += 1
+        } else if (row.DISTRICT == '03') {
+            yData[2] += 1
+        } else if (row.DISTRICT == '04') {
+            yData[3] += 1
+        } else if (row.DISTRICT == '05') {
+            yData[4] += 1
+        } else if (row.DISTRICT == '06') {
+            yData[5] += 1
+        } else {
+            yData[6] += 1
+        }
+    };
+
+    //Set up rest of Chart Data 
+    let barChartData = [
+        {
+            x: xData,
+            y: yData,
+            type: 'bar',
+            text: yData.map(String),
+            textposition: 'auto',
+            hoverinfo: 'none',
+            marker:{
+                color: ['rgba(11,97,210,1)', 'rgba(13,108,234,1)', 'rgba(30,122,243,1)', 'rgba(54,136,244,1)', 
+                'rgba(78,150,245,1)', 'rgba(102,165,247,1)']
+            }
+        }
+    ];
+
+    var barChartLayout = {
+        title: 'Bridges By District'
+    };
+
+    Plotly.newPlot('barChart', barChartData, barChartLayout);
 };
